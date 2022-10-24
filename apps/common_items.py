@@ -30,6 +30,8 @@ def create_subplot(fig,row, col, df, xaxes, yaxes, names):
         y=df_ind[yaxes]
         fig.add_trace(go.Scatter(x=x, y=y, name=name), row=row, col=col)
     return fig
+def get_options(df, col):
+    return [{'label':x,'value':x}for x in df[col].unique()]
 
 
 
