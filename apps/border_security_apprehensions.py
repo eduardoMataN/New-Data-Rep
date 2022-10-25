@@ -58,6 +58,50 @@ layout=html.Div([
                 ])
             ])
         ])
+    ]),
+    html.Br(),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    html.H2(children=['Monthly Apprehensions by Sector'], style=TITLE)
+                ])
+            ])
+        ])
+    ]),
+    dbc.Container([
+        dcc.Tabs(id='monthly-tabs', value='family-unit', children=[
+            dcc.Tab(label='Family Unit Apprehensions', value='family-unit', style=LABEL),
+            dcc.Tab(label='AUC Apprehensions', value='auc-app', style=LABEL)
+        ])
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    dcc.Dropdown(
+                        id='sector-monthly',
+                        options=get_options(df_family,'Sector'),
+                        value=df_family['Sector'].unique()[0],
+                        multi=False,
+                        style=DROPDOWN,
+                        optionHeight=90
+                    )
+                ])
+            ])
+        ])
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    dcc.Graph(
+                        id='monthly-graph',
+                        figure={}
+                    )
+                ])
+            ])
+        ])
     ])
 ])
 @app.callback(
@@ -69,6 +113,7 @@ layout=html.Div([
     Input('app-tabs','value')]
 )
 def update_data(sectorValue, sectorOptions, currentTab):
+    #Chunk for section 1:
     trigger_id=ctx.triggered_id
     if(currentTab=='tab-cit'):
         dff=df_cit.copy()
@@ -82,4 +127,6 @@ def update_data(sectorValue, sectorOptions, currentTab):
             sectorOptions=get_options(dff, 'Sector')
             sectorValue=dff['Sector'].unique()[0]
         fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Illegal Alien Apprehensions', color='Country')   
+    
+    #Chunk for section 2:
     return fig, sectorOptions, sectorValue
