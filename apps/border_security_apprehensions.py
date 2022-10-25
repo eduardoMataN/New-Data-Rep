@@ -23,6 +23,16 @@ df_southwesta=pd.read_excel(DATA_PATH.joinpath('Southwest Border Apprehensions.x
 df_southwestb=pd.read_excel(DATA_PATH.joinpath('Southwest Border Deaths.xlsx'))
 
 layout=html.Div([
+    html.Br(),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    html.H2(['Yearly Apprehensions by Sector'], style=TITLE)
+                ])
+            ])
+        ])
+    ]),
     dbc.Container([
         dcc.Tabs(id='app-tabs', value='tab-cit', children=[
             dcc.Tab(label='By Citizenship', value='tab-cit', style=LABEL),
