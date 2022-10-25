@@ -89,6 +89,7 @@ layout=html.Div([
         dbc.Row([
             dbc.Col([
                 html.Div([
+                    html.Label(['Sector'], style=LABEL),
                     dcc.Dropdown(
                         id='sector-monthly',
                         options=get_options(df_family,'Sector'),
@@ -112,17 +113,74 @@ layout=html.Div([
                 ])
             ])
         ])
+    ]),
+    html.Br(),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    html.H2(['Southwest Border'], style=TITLE)
+                ])
+            ])
+        ])
+    ]),
+    dbc.Container([
+        dcc.Tabs(id='south-tabs', value='apps', children=[
+            dcc.Tab(label='Apprehensions', value='apps', style=LABEL),
+            dcc.Tab(label='Deaths', value='deaths', style=LABEL)
+        ])
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    html.Label(['Sector'], style=LABEL),
+                    dcc.Dropdown(
+                        id='south-sector',
+                        options=get_options(df_southwesta, 'Sector'),
+                        value=df_southwesta['Sector'].unique()[0],
+                        multi=False,
+                        style=DROPDOWN,
+                        optionHeight=90
+                    )
+                ])
+            ])
+        ])
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    dcc.Graph(
+                        id='south-graph',
+                        figure={}
+                    )
+                ])
+            ])
+        ])
     ])
 ])
 @app.callback(
     [Output('apprehensions-graph', 'figure'),
     Output('select-sector','options'),
-    Output('select-sector','value')],
+    Output('select-sector','value'),
+    Output('sector-monthly','options'),
+    Output('sector-monthly','value'),
+    Output('monthly-graph','figure'),
+    Output('south-sector','options'),
+    Output('south-sector','value'),
+    Output('south-graph','figure')],
     [Input('select-sector','value'),
     Input('select-sector','options'),
-    Input('app-tabs','value')]
+    Input('app-tabs','value'),
+    Input('monthly-tabs', 'value'),
+    Input('sector-monthly', 'options'),
+    Input('sector-monthly','value'),
+    Input('south-tabs','value'),
+    Input('south-sector','options'),
+    Input('south-sector','value')]
 )
-def update_data(sectorValue, sectorOptions, currentTab):
+def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptions, monthlyValue, southTab, southOptions, southValue):
     #Chunk for section 1:
     trigger_id=ctx.triggered_id
     if(currentTab=='tab-cit'):
@@ -139,4 +197,30 @@ def update_data(sectorValue, sectorOptions, currentTab):
         fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Illegal Alien Apprehensions', color='Country')   
     
     #Chunk for section 2:
-    return fig, sectorOptions, sectorValue
+    if(monthlyTab=='family-unit'):
+        dff2=df_family.copy()
+        if(trigger_id=='monthly-tabs'):
+            monthlyOptions=get_options(dff2, 'Sector')
+            monthlyValue=dff2['Sector'].unique()[0]
+        fig2=px.line(filter_df(dff2, 'Sector',monthlyValue), x='Date', y='Total')
+    if(monthlyTab=='auc-app'):
+        dff2=df_uac.copy()
+        if(trigger_id=='monthly-tabs'):
+            monthlyOptions=get_options(dff2, 'Sector')
+            monthlyValue=dff2['Sector'].unique()[0]
+        fig2=px.line(filter_df(dff2, 'Sector', monthlyValue), x='Date', y='Unaccompanied Alien Children Apprehended')
+    
+    #Chunk for section 3:
+    if(southTab=='apps'):
+        dff3=df_southwesta.copy()
+        if(trigger_id=='south-tabs'):
+            southOptions=get_options(dff3, 'Sector')
+            southValue=dff3['Sector'].unique()[0]
+        fig3=px.line(filter_df(dff3,'Sector',southValue), x='Fiscal Year', y='Total')
+    if(southTab=='deaths'):
+        dff3=df_southwestb.copy()
+        if(trigger_id=='south-tabs'):
+            southOptions=get_options(dff3, 'Sector')
+            southValue=dff3['Sector'].unique()[0]
+        fig3=px.line(filter_df(dff3, 'Sector', southValue), x='Year', y='Deaths')
+    return fig, sectorOptions, sectorValue, monthlyOptions, monthlyValue, fig2, southOptions, southValue, fig3

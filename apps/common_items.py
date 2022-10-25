@@ -32,6 +32,8 @@ def create_subplot(fig,row, col, df, xaxes, yaxes, names):
     return fig
 def get_options(df, col):
     return [{'label':x,'value':x}for x in df[col].unique()]
+def filter_df(df, col, value):
+    return df[df[col]==value]
 
 
 
