@@ -44,3 +44,16 @@ layout=html.Div([
         ])
     ])
 ])
+@app.callback(
+    Output('staffing-graph', 'figure'),
+    Input('select-indicator','value')
+)
+def update_data(indicator):
+    if(indicator=='region'):
+        dff=df_region.copy()
+        fig=px.line(dff, x='Fiscal Year', y='Staffing ', color='Border Patrol Region')
+    if(indicator=='sector'):
+        dff=df_sector.copy()
+        fig=px.line(dff, x='Year', y='Staff', color='Sector')
+    fig.update_xaxes(rangeslider_visible=True)
+    return fig
