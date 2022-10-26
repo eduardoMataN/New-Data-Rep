@@ -35,8 +35,8 @@ layout=html.Div([
     ]),
     dbc.Container([
         dcc.Tabs(id='app-tabs', value='tab-cit', children=[
-            dcc.Tab(label='By Citizenship', value='tab-cit', style=LABEL),
-            dcc.Tab(label='By Country',value='tab-country', style=LABEL)
+            dcc.Tab(label='By Citizenship', value='tab-cit', style=tab_style, selected_style=tab_selected_style),
+            dcc.Tab(label='By Country',value='tab-country', style=tab_style, selected_style=tab_selected_style)
         ]),
     ]),
     html.Br(),

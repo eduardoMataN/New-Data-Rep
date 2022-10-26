@@ -23,10 +23,10 @@ df_race=pd.read_excel(DATA_PATH.joinpath('Poverty by Race.xlsx'))
 layout=html.Div([
     dbc.Container([
     dcc.Tabs(id='poverty-tabs', value='tab-age', children=[
-        dcc.Tab(label='By Age', value='tab-age'),
-        dcc.Tab(label='By Race', value='tab-race'),
-        dcc.Tab(label='By Sex', value='tab-sex'),
-        dcc.Tab(label='By Educational Attainment', value='tab-educ')
+        dcc.Tab(label='By Age', value='tab-age', style=tab_style, selected_style=tab_selected_style),
+        dcc.Tab(label='By Race', value='tab-race', style=tab_style, selected_style=tab_selected_style),
+        dcc.Tab(label='By Sex', value='tab-sex', style=tab_style, selected_style=tab_selected_style),
+        dcc.Tab(label='By Educational Attainment', value='tab-educ', style=tab_style, selected_style=tab_selected_style)
     ])]),
     html.Br(),
     html.Div(id='content-div', children=[

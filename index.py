@@ -12,7 +12,7 @@ from dash.dependencies import Input, Output, State
 from app import app
 from app import server
 
-from apps import border_security, common_items, demographic_indicators, economic_indicators_trade, education, social_indicators, transportation, transportation_border_crossings, economic_indicators_income, demographic_indicators_population, economic_indicators_employment, economic_indicators_industry, economic_indicators_remittances, social_indicators_crime, transportation_airport_activity, education_educational_attaintment_rate, social_indicators_poverty, border_security_apprehensions, border_security_staffing
+from apps import border_security, common_items, demographic_indicators, economic_indicators_trade, education, social_indicators, transportation, transportation_border_crossings, economic_indicators_income, demographic_indicators_population, economic_indicators_employment, economic_indicators_industry, economic_indicators_remittances, social_indicators_crime, transportation_airport_activity, education_educational_attaintment_rate, social_indicators_poverty, border_security_apprehensions, border_security_staffing, border_security_migration
 app.layout=html.Div(children=[dcc.Location(id='url', refresh=False),# type: ignore
     dbc.NavbarSimple(children=[
     dbc.DropdownMenu(
@@ -41,7 +41,8 @@ app.layout=html.Div(children=[dcc.Location(id='url', refresh=False),# type: igno
     dbc.DropdownMenu(
         [
             dbc.DropdownMenuItem('Apprehensions', href='/apps/border_security_apprehensions'),# type: ignore
-            dbc.DropdownMenuItem('Border Patrol Agent Staffing', href='/apps/border_security_staffing')
+            dbc.DropdownMenuItem('Border Patrol Agent Staffing', href='/apps/border_security_staffing'),
+            dbc.DropdownMenuItem('Migration Indicators', href='apps/border_security_migration')
             
         ],
         label='Border Security',# type: ignore
@@ -133,6 +134,8 @@ def display_page(pathname):
         return border_security_apprehensions.layout
     if pathname == '/apps/border_security_staffing':
         return border_security_staffing.layout
+    if pathname == '/apps/border_security_migration':
+        return border_security_migration.layout
     else:
         return demographic_indicators_population.layout
 

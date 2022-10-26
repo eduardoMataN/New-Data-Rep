@@ -19,6 +19,20 @@ LABEL={'font-weight':'bold', 'color':'#041E42'}
 TITLE={'color':'#041E42'}
 DROPDOWN={'width':'100%'}
 
+tab_style = {
+    'borderBottom': '1px solid #d6d6d6',
+    'padding': '6px',
+    'fontWeight': 'bold'
+}
+
+tab_selected_style = {
+    'borderTop': '1px solid #d6d6d6',
+    'borderBottom': '1px solid #d6d6d6',
+    'backgroundColor': '#FF8200',
+    'color': 'white',
+    'padding': '6px'
+}
+
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
  #Once we're on that path, we go into datasets. 
 def create_subplot(fig,row, col, df, xaxes, yaxes, names):

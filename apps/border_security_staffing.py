@@ -17,6 +17,9 @@ DATA_PATH = PATH.joinpath("../datasets/Border Patrol Agent Staffing").resolve()
 df_region=pd.read_excel(DATA_PATH.joinpath('Staffing by region.xlsx'))
 df_sector=pd.read_excel(DATA_PATH.joinpath('Staffing by Sector.xlsx'))
 
+
+
+
 layout=html.Div([
     dbc.Container([
         dbc.Row([
@@ -27,8 +30,8 @@ layout=html.Div([
     ]),
     dbc.Container([
         dcc.Tabs(id='select-indicator', value='region', children=[
-            dcc.Tab(label='By Region', value='region', style=LABEL),
-            dcc.Tab(label='By Sector', value='sector', style=LABEL)
+            dcc.Tab(label='By Region', value='region', style=tab_style, selected_style=tab_selected_style),
+            dcc.Tab(label='By Sector', value='sector', style=tab_style, selected_style=tab_selected_style)
         ])
     ]),
     dbc.Container([
