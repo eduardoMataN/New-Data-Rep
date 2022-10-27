@@ -17,6 +17,7 @@ PATH = pathlib.Path(__file__).parent #So this first line is going to the parent 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
 df_est=pd.read_excel(DATA_PATH.joinpath('Number of Establishments.xlsx'))
 toTable=df_est[df_est['Year']==df_est['Year'][0]][['County', 'Period', 'Value']]
+df_gdp=pd.read_excel(DATA_PATH.joinpath('GDP by Industry for Border Counties.xlsx'))
 
 layout=html.Div(children=[
     dbc.Container(children=[
@@ -35,7 +36,8 @@ layout=html.Div(children=[
         ]),
         dbc.Row([
             dbc.Col(
-                html.Div(
+                html.Div([
+                    html.Label(['County'], style=LABEL),
                     dcc.Dropdown(
                         id='select-county-ind',
                         options=[{'label':x, 'value':x} for x in df_est['County'].unique()],
@@ -44,10 +46,11 @@ layout=html.Div(children=[
                         style={'width':'100%'},
                         optionHeight=90            
                     )
-                )
+            ])
             ),
             dbc.Col([
-                html.Div(
+                html.Div([
+                    html.Label(['Year'], style=LABEL),
                     dcc.Dropdown(
                         id='select-year-ind',
                         options=[{'label':x, 'value':x} for x in df_est['Year'].unique()],
@@ -55,7 +58,7 @@ layout=html.Div(children=[
                         style={'width':'100%'},
                         optionHeight=90
                     )
-                )
+                ])
                     ])
         ]),
         html.Br(),
@@ -96,6 +99,7 @@ layout=html.Div(children=[
 def update_data(title, countyT,yearT):
     dff=df_est.copy()
     finalFig=px.line(dff, x='Year', y='Value', color='County')
-    finalFig.update_xaxes(nticks=len(pd.unique(dff['Year'])), rangeslider_visible=True)
+    finalFig.update_xaxes(nticks=len(pd.unique(dff['Year'])))
+    finalFig.update_xaxes( rangeslider_visible=True)
     toTable=dff[(dff['Year']==yearT) & (dff['County']==countyT)][['County', 'Period', 'Value']]
     return finalFig, toTable.to_dict('records'), [{'name':i, 'id':i} for i in toTable.columns]

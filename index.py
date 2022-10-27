@@ -42,7 +42,7 @@ app.layout=html.Div(children=[dcc.Location(id='url', refresh=False),# type: igno
         [
             dbc.DropdownMenuItem('Apprehensions', href='/apps/border_security_apprehensions'),# type: ignore
             dbc.DropdownMenuItem('Border Patrol Agent Staffing', href='/apps/border_security_staffing'),
-            dbc.DropdownMenuItem('Migration Indicators', href='apps/border_security_migration')
+            dbc.DropdownMenuItem('Migration Indicators', href='/apps/border_security_migration')
             
         ],
         label='Border Security',# type: ignore

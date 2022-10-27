@@ -106,11 +106,12 @@ layout=html.Div([
     [Input('poverty-tabs', 'value'),
     Input('select-county','options'), Input('select-county','value'),
     Input('select-category','options'), Input('select-category','value'),
-    Input('toggle-poverty','value'), Input('toggle-poverty','label')]
+    Input('toggle-poverty','value'), Input('toggle-poverty','label'),
+    Input('category-dropdown-label', 'children')]
 )
-def update_content(tab, countyOptions, countyValue, categoryOptions, categoryValue, toggleValue, toggleLabel):
+def update_content(tab, countyOptions, countyValue, categoryOptions, categoryValue, toggleValue, toggleLabel, categoryLabel):
     trigger_id=ctx.triggered_id
-    categoryLabel=['Age']
+    
     disableCounty=False
     disableCategory=False
     if(tab=='tab-age'):
@@ -124,13 +125,13 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             categoryLabel=['Age']
             toggleLabel='By County/By Age'
         if(toggleValue):
-            dff=dff[dff['Age']==categoryValue]
-            fig=px.line(dff,x='Year',y='Percentage',color='County')
-            disableCounty=True
-        else:
             dff=dff[dff['County']==countyValue]
             fig=px.line(dff, x='Year',y='Percentage', color='Age')
             disableCategory=True
+        else:
+            dff=dff[dff['Age']==categoryValue]
+            fig=px.line(dff,x='Year',y='Percentage',color='County')
+            disableCounty=True
             
         
     elif(tab=='tab-race'):
@@ -144,13 +145,13 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             categoryLabel=['Race']
             toggleLabel='By County/By Race'
         if(toggleValue):
-            dff=dff[dff['Race']==categoryValue]
-            fig=px.line(dff,x='Year',y='Percentage',color='County')
-            disableCounty=True
-        else:
             dff=dff[dff['County']==countyValue]
             fig=px.line(dff, x='Year',y='Percentage', color='Race')
             disableCategory=True
+        else:
+            dff=dff[dff['Race']==categoryValue]
+            fig=px.line(dff,x='Year',y='Percentage',color='County')
+            disableCounty=True
         
     elif(tab=='tab-sex'):
         dff=df_sex.copy()
@@ -163,13 +164,13 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             categoryLabel=['Sex']
             toggleLabel='By County/By Sex'
         if(toggleValue):
-            dff=dff[dff['Sex']==categoryValue]
-            fig=px.line(dff,x='Year',y='Percentage',color='County')
-            disableCounty=True
-        else:
             dff=dff[dff['County']==countyValue]
             fig=px.line(dff, x='Year',y='Percentage', color='Sex')
             disableCategory=True
+        else:
+            dff=dff[dff['Sex']==categoryValue]
+            fig=px.line(dff,x='Year',y='Percentage',color='County')
+            disableCounty=True
         
     elif(tab=='tab-educ'):
         dff=df_educ.copy()
@@ -182,13 +183,13 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             categoryLabel=['Educational Attainment']
             toggleLabel='By County/By Educational Attainment'
         if(toggleValue):
-            dff=dff[dff['Educational Attainment']==categoryValue]
-            fig=px.line(dff,x='Year',y='Percentage',color='County')
-            disableCounty=True
-        else:
             dff=dff[dff['County']==countyValue]
             fig=px.line(dff, x='Year',y='Percentage', color='Educational Attainment')
             disableCategory=True
+        else:
+            dff=dff[dff['Educational Attainment']==categoryValue]
+            fig=px.line(dff,x='Year',y='Percentage',color='County')
+            disableCounty=True
         
     else:
         title=['Poverty By Age']
@@ -209,5 +210,6 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             dff=dff[dff['County']==countyValue]
             fig=px.line(dff, x='Year',y='Percentage', color='Age')
             disableCategory=True
+    fig.update_xaxes(rangeslider_visible=True)
     
     return title, countyOptions, countyValue, disableCounty, categoryLabel,categoryOptions, categoryValue, disableCategory,toggleLabel, fig

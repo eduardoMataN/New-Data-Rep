@@ -40,7 +40,45 @@ layout=html.Div([
                         optionHeight=90
                     )
                 ])
+            ]),
+            dbc.Col([
+                html.Div([
+                    daq.BooleanSwitch(
+                        id='state-county',
+                        on=False,
+                        label='By State/By County',
+                        style=LABEL,
+                        color=orange
+                    )
+                ])
+            ], width=2)
+        ])
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    dcc.Graph(
+                        id='migration-graph',
+                        figure={}
+                    )
+                ])
             ])
         ])
     ])
 ])
+
+@app.callback(
+    Output('migration-graph','figure'),
+    [Input('select-flow','value'),
+    Input('state-county','on')]
+)
+def update_data(migrationFlow, view):
+    dff=df_migration.copy()
+    dff=filter_df(dff, 'Migration', migrationFlow)
+    if(view):
+        fig=px.line(dff, x='Year', y='Value', color='County')
+    else:
+        fig=px.line(sum_df(dff, 'State', 'Year', 'Value'), x='Year', y='Value', color='State')
+    fig.update_xaxes(rangeslider_visible=True)
+    return fig

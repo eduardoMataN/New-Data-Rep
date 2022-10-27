@@ -48,6 +48,19 @@ def get_options(df, col):
     return [{'label':x,'value':x}for x in df[col].unique()]
 def filter_df(df, col, value):
     return df[df[col]==value]
+def sum_df(df, sumCol, sumBy, target):
+    newDf={sumBy:[], sumCol:[], target:[]}
+    colValues=df[sumCol].unique()
+    sumByValues=df[sumBy].unique()
+    for sumValue in sumByValues:
+        for value in colValues:
+            df_temp=filter_df(df, sumBy, sumValue)
+            df_temp=filter_df(df_temp, sumCol, value)
+            newDf[sumBy].append(sumValue)
+            newDf[sumCol].append(value)
+            newDf[target].append(sum(df_temp[target]))
+   
+    return pd.DataFrame.from_dict(newDf)
 
 
 

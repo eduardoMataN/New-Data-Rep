@@ -117,6 +117,8 @@ def update_data(type, county1, county2, on):
         dff2=dff[dff['County']==county2]
         fig=create_subplot(fig,1,1,dff1,'Year','Number','County')
         fig=create_subplot(fig,1,2,dff2,'Year','Number','County')
+        fig.update_xaxes(rangeslider= {'visible':True}, row=1, col=1)
+        fig.update_xaxes(rangeslider= {'visible':True}, row=1, col=2)
         
         d1_dis=False
         d2_dis=False
