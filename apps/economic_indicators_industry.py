@@ -82,6 +82,15 @@ layout=html.Div(children=[
                 ])
             ])
         )
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    
+                ])
+            ])
+        ])
     ])
 ])
 
