@@ -137,7 +137,7 @@ def display_page(pathname):
     if pathname == '/apps/border_security_migration':
         return border_security_migration.layout
     else:
-        return demographic_indicators_population.layout
+        return border_security_apprehensions.layout
 
 
 
