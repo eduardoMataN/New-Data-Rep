@@ -1,4 +1,6 @@
 
+from faulthandler import disable
+from operator import truediv
 import pandas as pd
 import plotly.express as px
 import dash as dash
@@ -83,11 +85,73 @@ layout=html.Div(children=[
             ])
         )
     ]),
+    html.Br(),
     dbc.Container([
         dbc.Row([
             dbc.Col([
                 html.Div([
-                    
+                    html.H1(['GDP by Industry for Border Counties'], style=TITLE)
+                ])
+            ])
+        ])
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    daq.PowerButton(
+                        id='county-button',
+                        on=True,
+                        color=orange
+                    )
+                ])
+            ], width=1),
+            dbc.Col([
+                html.Div([
+                    html.Label(['County'], style=LABEL),
+                    dcc.Dropdown(
+                        id='select-county-gdp',
+                        options=get_options(df_gdp, 'County'),
+                        value=df_gdp['County'].unique()[0],
+                        multi=False,
+                        style=DROPDOWN,
+                        optionHeight=90,
+                        disabled=False
+                    )
+                ])
+            ]),
+            dbc.Col([
+                html.Div([
+                    daq.PowerButton(
+                        id='industry-button',
+                        on=False,
+                        color=orange
+                    )
+                ])
+            ], width=1),
+            dbc.Col([
+                html.Div([
+                    html.Label(['Industry'], style=LABEL),
+                    dcc.Dropdown(
+                        id='select-industry-gdp',
+                        options=get_options(df_gdp, 'Description'),
+                        value=df_gdp['Description'].unique()[0],
+                        style=DROPDOWN,
+                        optionHeight=90,
+                        disabled=True
+                    )
+                ])
+            ])
+        ])
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    dcc.Graph(
+                        id='gdp-graph',
+                        figure={}
+                    )
                 ])
             ])
         ])
@@ -98,17 +162,51 @@ layout=html.Div(children=[
     
         
         [Output(component_id='line-1', component_property='figure'),
-        Output('industry-table', 'data'), Output('industry-table', 'columns')]
+        Output('industry-table', 'data'), Output('industry-table', 'columns'),
+        Output('gdp-graph','figure'),
+        Output('county-button','on'),
+        Output('select-county-gdp','disabled'),
+        Output('industry-button','on'),
+        Output('select-industry-gdp','disabled')]
     ,
     
         [Input('title', 'children'), Input('select-county-ind', 'value'),
-        Input('select-year-ind', 'value')]
+        Input('select-year-ind', 'value'),
+        Input('county-button','on'),
+        Input('select-county-gdp','value'),
+        Input('industry-button', 'on'),
+        Input('select-industry-gdp','value')]
     
 )
-def update_data(title, countyT,yearT):
+def update_data(title, countyT,yearT, countyOn, countyValue, industryOn, industryValue):
+    trigger_id=ctx.triggered_id
     dff=df_est.copy()
     finalFig=px.line(dff, x='Year', y='Value', color='County')
     finalFig.update_xaxes(nticks=len(pd.unique(dff['Year'])))
     finalFig.update_xaxes( rangeslider_visible=True)
     toTable=dff[(dff['Year']==yearT) & (dff['County']==countyT)][['County', 'Period', 'Value']]
-    return finalFig, toTable.to_dict('records'), [{'name':i, 'id':i} for i in toTable.columns]
+
+    #GDP Section:
+    disableCounty=False
+    disableIndustry=True
+    dff2=df_gdp.copy()
+    if(trigger_id=='industry-button'):
+        disableCounty=True
+        disableIndustry=False
+        countyOn=False
+        industryOn=True
+        fig=px.line(filter_df(dff2, 'Description', industryValue), x='Year', y='GDP', color='County')
+    if(trigger_id=='county-button'):
+        disableCounty=False
+        disableIndustry=True
+        countyOn=True
+        industryOn=False
+        fig=px.line(filter_df(dff2, 'County', countyValue), x='Year', y='GDP', color='Description')
+    if(countyOn):
+        fig=px.line(filter_df(dff2, 'County', countyValue), x='Year', y='GDP', color='Description')
+    if(industryOn):
+        fig=px.line(filter_df(dff2, 'Description', industryValue), x='Year', y='GDP', color='County')
+    fig.update_xaxes(rangeslider_visible=True)
+    
+
+    return finalFig, toTable.to_dict('records'), [{'name':i, 'id':i} for i in toTable.columns], fig, countyOn, disableCounty, industryOn, disableIndustry

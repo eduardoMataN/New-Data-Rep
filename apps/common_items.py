@@ -42,7 +42,10 @@ def create_subplot(fig,row, col, df, xaxes, yaxes, names):
         df_ind=df_sub[df_sub[names]==name]
         x=df_ind[xaxes]
         y=df_ind[yaxes]
-        fig.add_trace(go.Scatter(x=x, y=y, name=name), row=row, col=col)
+        if(col>1 or row>1):
+            fig.add_trace(go.Scatter(x=x, y=y, name=name, legendgroup='group1', showlegend=False), row=row, col=col)
+        else:
+            fig.add_trace(go.Scatter(x=x, y=y, name=name, legendgroup='group1'), row=row, col=col)
     return fig
 def get_options(df, col):
     return [{'label':x,'value':x}for x in df[col].unique()]

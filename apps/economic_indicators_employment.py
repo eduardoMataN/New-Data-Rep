@@ -11,12 +11,14 @@ import pathlib
 from app import app
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from apps.common_items import *
 
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
 df_emp= pd.read_excel(DATA_PATH.joinpath("Total Employment by Industry, County.xlsx"))
 df_total=pd.read_excel(DATA_PATH.joinpath("Total Employment by County, LBS.xlsx"))
 df_unemp=pd.read_excel(DATA_PATH.joinpath("Unemployment by County.xlsx"))
+
 
 layout=html.Div(children=[
     dbc.Container(children=[
@@ -76,7 +78,8 @@ layout=html.Div(children=[
                         id='led-emp',
                         label='Employment',
                         value=5,
-                        style={'color':'#FF8200'}
+                        style={'color':'#FF8200', 'font-weight':'bold'},
+                        color=blue
                     )
                 ])
             ]),
@@ -85,7 +88,8 @@ layout=html.Div(children=[
                     id='led-unemp',
                     label='Unemployment',
                     value=5,
-                    style={'color':'#FF8200'}
+                    style={'color':'#FF8200', 'font-weight':'bold'},
+                    color=blue
                 )
             ]),
             dbc.Col([
@@ -130,13 +134,25 @@ layout=html.Div(children=[
             ])
         ])
     ]),
-    
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    dcc.Graph(
+                        id='employment-graph',
+                        figure={}
+                    )
+                ])
+            ])
+        ])
+    ])
 ])
 
 @app.callback(
     [
         Output(component_id='led-emp', component_property='value'), Output(component_id='led-unemp', component_property='value'),
-        Output(component_id='emp-month-select', component_property='disabled'), Output(component_id='unemp-month-select', component_property='disabled')
+        Output(component_id='emp-month-select', component_property='disabled'), Output(component_id='unemp-month-select', component_property='disabled'),
+        Output('employment-graph', 'figure')
     ],
     [
         Input(component_id='emp-monthly-pw', component_property='on'), Input(component_id='unemp-monthly-pw', component_property='on'),
@@ -164,4 +180,9 @@ def update_data(empPw, unemPw, countyEmp, countyUnemp, yearEmp, yearUnemp, month
     else:
         monthSU=True
         unemp=sum(dfunemp[(dfunemp['County']==countyUnemp) & (dfunemp['Year']==yearUnemp)]['Unemployed'])
-    return emp, unemp, monthSE, monthSU
+    dff=df_emp.copy()
+    fig=make_subplots(2,1)
+    fig=create_subplot(fig, 1, 1, filter_df(dff, 'County', countyEmp), 'Year', 'Value', 'Description')
+    fig=create_subplot(fig, 2, 1, filter_df(dff, 'County', countyUnemp), 'Year', 'Value', 'Description')
+    fig.update_layout(height=700)
+    return emp, unemp, monthSE, monthSU, fig
