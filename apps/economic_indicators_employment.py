@@ -138,6 +138,15 @@ layout=html.Div(children=[
         dbc.Row([
             dbc.Col([
                 html.Div([
+                    html.H2(['Employment by Industry'], style=TITLE)
+                ])
+            ])
+        ])
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
                     dcc.Graph(
                         id='employment-graph',
                         figure={}

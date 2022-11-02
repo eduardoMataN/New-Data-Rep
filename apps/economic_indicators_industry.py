@@ -1,6 +1,4 @@
 
-from faulthandler import disable
-from operator import truediv
 import pandas as pd
 import plotly.express as px
 import dash as dash
@@ -72,7 +70,7 @@ layout=html.Div(children=[
                         columns=[{'name':i, 'id':i} for i in toTable.columns],
                         data=toTable.to_dict('records'),
                         editable=True,
-                        filter_action='native',
+                        filter_action='none',
                         sort_action='native',
                         sort_mode='multi',
                         row_selectable=False,
@@ -83,7 +81,14 @@ layout=html.Div(children=[
                     )
                 ])
             ])
-        )
+        ),
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    html.H6(['Source: The Book of Answers of Life'])
+                ])
+            ])
+        ])
     ]),
     html.Br(),
     dbc.Container([
@@ -154,6 +159,13 @@ layout=html.Div(children=[
                     )
                 ])
             ])
+        ]),
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    html.H6(['Source: The Book of Answers of Life'])
+                ])
+            ])
         ])
     ])
 ])
@@ -181,7 +193,7 @@ layout=html.Div(children=[
 def update_data(title, countyT,yearT, countyOn, countyValue, industryOn, industryValue):
     trigger_id=ctx.triggered_id
     dff=df_est.copy()
-    finalFig=px.line(dff, x='Year', y='Value', color='County')
+    finalFig=px.line(sum_df(dff, 'County', 'Year', 'Value'), x='Year', y='Value', color='County', color_discrete_sequence=get_colors(dff['County'].unique()))
     finalFig.update_xaxes(nticks=len(pd.unique(dff['Year'])))
     finalFig.update_xaxes( rangeslider_visible=True)
     toTable=dff[(dff['Year']==yearT) & (dff['County']==countyT)][['County', 'Period', 'Value']]
@@ -195,17 +207,25 @@ def update_data(title, countyT,yearT, countyOn, countyValue, industryOn, industr
         disableIndustry=False
         countyOn=False
         industryOn=True
-        fig=px.line(filter_df(dff2, 'Description', industryValue), x='Year', y='GDP', color='County')
+        
     if(trigger_id=='county-button'):
         disableCounty=False
         disableIndustry=True
         countyOn=True
         industryOn=False
-        fig=px.line(filter_df(dff2, 'County', countyValue), x='Year', y='GDP', color='Description')
+        
     if(countyOn):
-        fig=px.line(filter_df(dff2, 'County', countyValue), x='Year', y='GDP', color='Description')
+        fig=px.line(filter_df(dff2, 'County', countyValue), x='Year', y='GDP', color='Description', color_discrete_sequence=get_colors(dff2['Description'].unique()))
+        disableCounty=False
+        disableIndustry=True
+        countyOn=True
+        industryOn=False
     if(industryOn):
-        fig=px.line(filter_df(dff2, 'Description', industryValue), x='Year', y='GDP', color='County')
+        fig=px.line(filter_df(dff2, 'Description', industryValue), x='Year', y='GDP', color='County', color_discrete_sequence=get_colors(dff2['County'].unique()))
+        disableCounty=True
+        disableIndustry=False
+        countyOn=False
+        industryOn=True
     fig.update_xaxes(rangeslider_visible=True)
     
 

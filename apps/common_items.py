@@ -1,4 +1,4 @@
-
+import random
 import pandas as pd
 import plotly.express as px
 import dash as dash
@@ -12,6 +12,43 @@ from app import app
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+legend_colors={0:'#041E42',
+            1:'#FF8200', 
+            2:'#fff100', 
+            3:'#19C824', 
+            4:'#AEF6C1', 
+            5:'#F98FD9', 
+            6:'#C7AFDD', 
+            7:'#93F9F6', 
+            8:'#FF8200',
+            9:'#A4C350',
+            10:'#37EDCF',
+            11:'#FF3185',
+            12:'#D399FD',
+            13:'#46C1FB',
+            14:'#B1B3B3',
+            15:'#F05A28',
+            16:'#D8E877',
+            17:'#16E487',
+            18:'#F039EE',
+            19:'#8D73D5',
+            20:'#2011B3',
+            21:'#D6A00B',
+            22:'#EB1427',
+            23:'#69A166',
+            24:'#3A7538',
+            25:'#6905F6',
+            26:'#652D90',
+            27:'#2D447C',
+            28:'#8A6C63',
+            29:'#990000',
+            30:'#065624',
+            31:'#93D8C2',
+            32:'#921559',
+            33:'#45394F',
+            34:'#041E42',
+            35:'#FB4E2D'
+}
 
 blue='#041E42'
 orange='#FF8200'
@@ -64,6 +101,16 @@ def sum_df(df, sumCol, sumBy, target):
             newDf[target].append(sum(df_temp[target]))
    
     return pd.DataFrame.from_dict(newDf)
+
+def get_colors(legend):
+    final_color_list=[]
+    for i in range(0, len(legend)):
+        if(i>len(legend_colors)):
+            r = lambda: random.randint(0,255)
+            final_color_list.append('#%02X%02X%02X' % (r(),r(),r()))
+        else:
+            final_color_list.append(legend_colors[i])
+    return final_color_list
 
 
 
