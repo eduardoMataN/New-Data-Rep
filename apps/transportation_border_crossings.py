@@ -154,37 +154,8 @@ layout=html.Div(children=[
                                 value=df['Measure'].tolist()[0],
                                 style={'width':'100%'},
                                 optionHeight=90)
-                ]),
-                width=2
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Label(['Initial Value'], style={'font-weight':'bold', 'width':'100%', 'color':'#041E42'}),
-                      daq.NumericInput(
-                        id='Y-Axes1-Start', min=0, max=df_copy['Value'].max(), value=0, size=80
-                      )
-                ], style={'width':'110%'}),
-                width=1
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Label(['End Value'], style={'font-weight':'bold', 'color':'#041E42'}),
-                      daq.NumericInput(
-                        id='Y-Axes1-End', min=1, max=df_copy['Value'].max(), value=df_copy['Value'].max(), size=80
-                      )
                 ])
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Button('Reset', id='reset-button', n_clicks=0)
-                ]),
-                width=1
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Button('Reset', id='reset-button2', n_clicks=0)
-                ]),
-                width=1
+                
             ),
             dbc.Col(
                 html.Div([
@@ -195,25 +166,9 @@ layout=html.Div(children=[
                         value=df['Measure'].tolist()[0],
                         style={'width':'100%'},
                         optionHeight=90)
-                ]), width=2
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Label(['Initial Value'], style={'font-weight':'bold', 'color':'#041E42'}),
-                      daq.NumericInput(
-                        id='Y-Axes2-Start', min=0, max=df_copy['Measure'].max(), value=0, size=80
-                      )
-                ], style={'width':'110%'}),
-                width=1
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Label(['End Value'], style={'font-weight':'bold', 'color':'#041E42'}),
-                      daq.NumericInput(
-                        id='Y-Axes2-End', min=1, max=df_copy['Value'].max(), value=df_copy['Value'].max(), size=80
-                      )
                 ])
-            )
+            ),
+            
             
         ]),
 
@@ -224,16 +179,11 @@ layout=html.Div(children=[
             
             dbc.Col([
                 html.Div([
-                    dcc.Graph(id='graph', figure={}, style={'height':'65vh', 'width':'60vh'})
+                    dcc.Graph(id='graph', figure={})
                 ]),
                 
-                ], width=6),
-            dbc.Col([
-                html.Div([
-                    dcc.Graph(id='graph2', figure={}, style={'height':'65vh', 'width':'60vh'})
                 ]),
-                
-        ]),
+            
             
         ])
     ]),
@@ -325,39 +275,27 @@ layout=html.Div(children=[
 )
 
 @app.callback(
-    [Output(component_id='graph', component_property='figure'), Output(component_id='graph2', component_property='figure'), 
+    [Output(component_id='graph', component_property='figure'), 
     Output(component_id='County-Title', component_property='children'), Output(component_id='County-Title2', component_property='children'),
     Output(component_id='Number1', component_property='value'), Output(component_id='Number2', component_property='value'),
     Output(component_id='Indic-Title', component_property='children'), Output(component_id='Indic-Title2', component_property='children'),
-    Output(component_id='Y-Axes1-Start', component_property='max'), Output(component_id='Y-Axes1-End', component_property='min'),
-    Output(component_id='Y-Axes2-Start', component_property='max'), Output(component_id='Y-Axes2-End', component_property='min'),
-    Output(component_id='reset-button', component_property='n_clicks'),
-    Output(component_id='Y-Axes1-Start', component_property='value'), Output(component_id='Y-Axes1-End', component_property='value'),
-    Output(component_id='Y-Axes2-Start', component_property='value'), Output(component_id='Y-Axes2-End', component_property='value'),
-    Output(component_id='reset-button2', component_property='n_clicks')],
+    ],
     [Input(component_id='select-indicator', component_property='value'),
     Input(component_id='select-indicator2', component_property='value'),
-    Input(component_id='Y-Axes1-Start', component_property='value'), Input(component_id='Y-Axes1-End', component_property='value'),
-    Input(component_id='Y-Axes2-Start', component_property='value'), Input(component_id='Y-Axes2-End', component_property='value'),
-    Input(component_id='reset-button', component_property='n_clicks'), Input(component_id='reset-button2', component_property='n_clicks')]
+    ]
 )
-def update_indicator(indicator,  indicator2, start1, end1, start2, end2, resetB, resetB2):
+def update_indicator(indicator,  indicator2):
     dff=df.copy()
     dff['Date'] = pd.to_datetime(df['Date'], format='%y%m')
     dff=dff[dff['Measure']==indicator]
     trigger_id=ctx.triggered_id
-    if(trigger_id=='select-indicator'):
-        resetB+=1
-    if(resetB>0):
-        start1= 0 #dff['Value'].min()
-        end1=dff['Value'].max()
-        resetB=0
+    
+    
 
     #dff=dff[(dff['Value']>=start1) & (dff['Value']<=end1)]
     
-    fig=px.line(dff, x='Date', y='Value', title=indicator+' by Port ', color='Port',  width=750, height=720)
+    fig=px.line(dff, x='Date', y='Value', title=indicator+' by Port ', color='Port')
     fig.update_xaxes(nticks=len(pd.unique(dff['Year'])), rangeslider_visible=True)
-    fig.update_layout(yaxis_range=[start1,end1])
     fig.update_layout(legend=dict(
     orientation="v",
     yanchor="top",
@@ -372,22 +310,17 @@ def update_indicator(indicator,  indicator2, start1, end1, start2, end2, resetB,
     dff2=df.copy()
     dff['Date'] = pd.to_datetime(df['Date'], format='%y%m')
     dff2=dff2[dff2['Measure']==indicator2]
-    if(trigger_id=='select-indicator2'):
-        resetB2+=1
-    if(resetB2>0):
-        start2=0  #dff2['Value'].min()
-        end2=dff2['Value'].max()
-        resetB2=0
+    
+    
     
     #dff2=dff2[(dff2['Value']>=start2) & (dff2['Value']<=end2)]
-    fig2=px.line(dff2,x='Date', y='Value', title=indicator2+' by County ', color='Port',  width=750, height=720)
-    fig2.update_xaxes(nticks=len(pd.unique(dff2['Year'])), rangeslider_visible=True)
-    fig2.update_layout(yaxis_range=[start2,end2])
     
-    fig2.update_layout(title_y=1, title_x=0.5, margin=dict(l=0, r=0, t=0, b=0))
+    
+    
+    
     dff=dff[dff['Year']==dff['Year'].max()]
     dff2=dff2[dff2['Year']==dff2['Year'].max()] 
-    return fig, fig2, indicator, indicator2, sum(dff['Value']), sum(dff2['Value']), 'Current '+indicator, 'Current '+indicator2, end1-1, start1+1, end2-1, start2+1, resetB, start1, end1, start2, end2, resetB2
+    return fig, indicator, indicator2, sum(dff['Value']), sum(dff2['Value']), 'Current '+indicator, 'Current '+indicator2
 
 
 

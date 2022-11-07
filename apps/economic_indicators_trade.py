@@ -14,7 +14,7 @@ from plotly.subplots import make_subplots
 from apps.common_items import *
 
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
-DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
+DATA_PATH = PATH.joinpath("../datasets/Trade").resolve() #Once we're on that path, we go into datasets. 
 df_trade_hs= pd.read_excel(DATA_PATH.joinpath("Imports & Exports by HS Commodities, yearly.xlsx"))
 df_trade_naics=pd.read_excel(DATA_PATH.joinpath("Exports & Imports by NAICS Commodities, yearly.xlsx"))
 df_ep=pd.read_excel(DATA_PATH.joinpath("Total Flows to El Paso.xlsx"))
@@ -248,6 +248,8 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
             fig=make_subplots(1,2)
             fig=create_subplot(fig, 1, 1, dff_compare, 'Year', 'Value', 'District')
             fig=create_subplot(fig, 1, 2, dff_compare2, 'Year', 'Value', 'District')
+            fig.update_xaxes(rangeslider= {'visible':True}, row=1, col=1)
+            fig.update_xaxes(rangeslider= {'visible':True}, row=1, col=2)
             
         else:
             fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Value', color='District')
@@ -270,17 +272,24 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
             if(toggleImEx):
                 fig=create_subplot(fig, 1, 1, dff[(dff['Port']==portValue1)&(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], 'Year', 'Exports','Port')
                 fig=create_subplot(fig, 1, 2, dff[(dff['Port']==portValue2)&(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], 'Year', 'Exports','Port')
+                fig.update_xaxes(rangeslider= {'visible':True}, row=1, col=1)
+                fig.update_xaxes(rangeslider= {'visible':True}, row=1, col=2)
             else:
                 fig=create_subplot(fig, 1, 1, dff[(dff['Port']==portValue1)&(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], 'Year', 'Imports','Port')
                 fig=create_subplot(fig, 1, 2, dff[(dff['Port']==portValue2)&(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], 'Year', 'Imports','Port')
+                fig.update_xaxes(rangeslider= {'visible':True}, row=1, col=1)
+                fig.update_xaxes(rangeslider= {'visible':True}, row=1, col=2)
         else:
             if(toggleImEx):
                 fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Exports', color='Port')
+                fig.update_xaxes(rangeslider_visible=True)
             else:
                 fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Imports', color='Port')
+                fig.update_xaxes(rangeslider_visible=True)
     #Chunk to Update Second Section:
     dff_ep=df_ep.copy()
     fig2=px.line(dff_ep[dff_ep['Mode']==mode], x='Year', y="Total", color='Commodity')
     total_f=round(sum(dff_ep[dff_ep['Mode']==mode]['Total']),1)
     fig2.update_xaxes(tick0=1, dtick=1)
+    fig2.update_xaxes(rangeslider_visible=True)
     return fig, comparePort1, comparePort2, importsToggle, measureOptions, measureValue, commodityOptions, commodityValue, portOptions1, portValue1, portOptions2, portValue2, fig2, total_f
