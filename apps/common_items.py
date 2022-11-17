@@ -127,7 +127,7 @@ def get_colors(legend):
 def generate_sidebar(title):
     sidebar=html.Div(
     [
-        html.H6(title),
+        html.H6(id='sidebar-title',children=title),
         html.Hr(),
         html.P(
             "Use the following buttons to edit the chart.", className="lead"
@@ -135,7 +135,7 @@ def generate_sidebar(title):
         dbc.Nav(
             [
                 dbc.NavLink("Percent Change", href="percent-change", active="exact"),
-                dbc.NavLink("Page 1", href="/page-1", active="exact"),
+                dbc.NavLink("Original Chart", href="original", active="exact"),
                 dbc.NavLink("Page 2", href="/page-2", active="exact"),
             ],
             vertical=True,

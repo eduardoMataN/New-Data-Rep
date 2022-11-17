@@ -12,21 +12,31 @@ from app import app
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from apps.common_items import *
+from apps.dataset import *
 DATA_PATH = PATH.joinpath("../datasets/Apprehensions").resolve()
 
-
 df_cit=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Citizenship.xlsx'))
+citDataset=dataset('Yearly Apprehensions by Citizenship', df_cit, df_cit['Apprehensions'].pct_change())
+
 df_country=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Country.xlsx'))
+countryDataset=dataset('Yearly Apprehensions by Country', df_country, df_country['Illegal Alien Apprehensions'].pct_change())
+
 df_uac=pd.read_excel(DATA_PATH.joinpath('Monthly UAC Apprehensions by Sector.xlsx'))
+
 df_family=pd.read_excel(DATA_PATH.joinpath('Monthly Family Unit Apprehensions.xlsx'))
+
 df_southwesta=pd.read_excel(DATA_PATH.joinpath('Southwest Border Apprehensions.xlsx'))
+
 df_southwestb=pd.read_excel(DATA_PATH.joinpath('Southwest Border Deaths.xlsx'))
+
 current=df_cit.copy()
 previous=df_cit.copy()
 show_sidebar=True
 
 
 layout=html.Div([
+    html.H6(id='dummy1', children='', hidden=True),
+    html.Div(id='dummy',children=[], hidden=True),
     html.Div(dcc.Location(id='sidebar-location',refresh=False)),
     html.Div(id='sidebar-space',children=[
         
@@ -187,7 +197,8 @@ layout=html.Div([
     ])
 ])
 @app.callback(
-    Output('sidebar-space','children'),
+    [Output('sidebar-space','children'),
+    Output('dummy1','children')],
     [Input('edit-yearly','n_clicks'),
     Input('sidebar-space','children'),
     Input('app-tabs','value')]
@@ -196,15 +207,33 @@ def get_sidebar(button, sidebarSpace, currentTabApp):
     trigger_id=ctx.triggered_id
     sidebar=html.Div()
     show=show_sidebar
+    title=''
     if(trigger_id=='edit-yearly'):
-        sidebar=generate_sidebar('Yearly Apprehensions Chart')
         if(currentTabApp=='tab-cit'):
-            current=df_cit
-            previous=df_cit
-            
-        
-    return sidebar
+            title='Yearly Apprehensions by Citizenship Chart'
+            sidebar=generate_sidebar('Yearly Apprehensions by Citizenship Chart')
+        else:
+            title='Yearly Apprehensions by Country Chart'
+            sidebar=generate_sidebar('Yearly Apprehensions by Country Chart')      
+    return sidebar, title
 
+@app.callback(
+    Output('dummy','children'),
+    [Input('sidebar-location', 'pathname'),
+    Input('dummy1', 'children')]
+)
+def update_chart(pathname, title):
+    if(pathname=='percent-change'):
+        if(title=='Yearly Apprehensions by Citizenship Chart'):
+            citDataset.activateDataframe('PercentChange')
+        if(title=='Yearly Apprehensions by Country Chart'):
+            countryDataset.activateDataframe('PercentChange')
+    if(pathname=='original'):
+        if(title=='Yearly Apprehensions by Citizenship Chart'):
+            citDataset.activateDataframe('Original')
+        if(title=='Yearly Apprehensions by Country Chart'):
+            countryDataset.activateDataframe('Original')
+    return None
 
 @app.callback(
     [Output('apprehensions-graph', 'figure'),
@@ -234,14 +263,14 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
     #Chunk for section 1:
     trigger_id=ctx.triggered_id
     if(currentTab=='tab-cit'):
-        dff=df_cit.copy()
+        dff=citDataset.getActive().copy()
         if(trigger_id=='app-tabs'):
             sectorOptions=get_options(dff, 'Sector')
             sectorValue=dff['Sector'].unique()[0]
         fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Apprehensions', color='Citizenship')
         fig.update_xaxes(rangeslider_visible=True)
     if(currentTab=='tab-country'):
-        dff=df_country.copy()
+        dff=countryDataset.getActive().copy()
         if(trigger_id=='app-tabs'):
             sectorOptions=get_options(dff, 'Sector')
             sectorValue=dff['Sector'].unique()[0]
