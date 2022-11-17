@@ -296,15 +296,7 @@ def update_indicator(indicator,  indicator2):
     
     fig=px.line(dff, x='Date', y='Value', title=indicator+' by Port ', color='Port')
     fig.update_xaxes(nticks=len(pd.unique(dff['Year'])), rangeslider_visible=True)
-    fig.update_layout(legend=dict(
-    orientation="v",
-    yanchor="top",
-    y=1,
-    xanchor="left",
-    x=-0.3
-    ))
-    fig.update_layout(title_y=1, title_x=0.5, margin=dict(l=0, r=0, t=0, b=0))
-    fig.update_yaxes(visible=False)
+    
     
 
     dff2=df.copy()

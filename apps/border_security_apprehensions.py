@@ -21,8 +21,16 @@ df_uac=pd.read_excel(DATA_PATH.joinpath('Monthly UAC Apprehensions by Sector.xls
 df_family=pd.read_excel(DATA_PATH.joinpath('Monthly Family Unit Apprehensions.xlsx'))
 df_southwesta=pd.read_excel(DATA_PATH.joinpath('Southwest Border Apprehensions.xlsx'))
 df_southwestb=pd.read_excel(DATA_PATH.joinpath('Southwest Border Deaths.xlsx'))
+current=df_cit.copy()
+previous=df_cit.copy()
+show_sidebar=True
+
 
 layout=html.Div([
+    html.Div(dcc.Location(id='sidebar-location',refresh=False)),
+    html.Div(id='sidebar-space',children=[
+        
+    ]),
     html.Br(),
     dbc.Container([
         dbc.Row([
@@ -54,8 +62,14 @@ layout=html.Div([
                         optionHeight=90
                     )
                 ])
-            ])
-        ])
+            ]),
+            dbc.Col([
+                html.Div([
+                    dbc.Button('Edit Graph', id='edit-yearly', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                ])
+            ], width=2)
+        ]),
+       
     ]),
     dbc.Container([
         dbc.Row([
@@ -81,10 +95,11 @@ layout=html.Div([
     ]),
     dbc.Container([
         dcc.Tabs(id='monthly-tabs', value='family-unit', children=[
-            dcc.Tab(label='Family Unit Apprehensions', value='family-unit', style=LABEL),
-            dcc.Tab(label='AUC Apprehensions', value='auc-app', style=LABEL)
+            dcc.Tab(label='Family Unit Apprehensions', value='family-unit', style=tab_style, selected_style=tab_selected_style),
+            dcc.Tab(label='AUC Apprehensions', value='auc-app', style=tab_style, selected_style=tab_selected_style)
         ])
     ]),
+    html.Br(),
     dbc.Container([
         dbc.Row([
             dbc.Col([
@@ -99,7 +114,12 @@ layout=html.Div([
                         optionHeight=90
                     )
                 ])
-            ])
+            ]),
+            dbc.Col([
+                html.Div([
+                    dbc.Button('Edit Graph', id='edit-monthly', outline=True, color="primary", className="me-1", value='monthly')
+                ])
+            ], width=2)
         ])
     ]),
     dbc.Container([
@@ -126,10 +146,11 @@ layout=html.Div([
     ]),
     dbc.Container([
         dcc.Tabs(id='south-tabs', value='apps', children=[
-            dcc.Tab(label='Apprehensions', value='apps', style=LABEL),
-            dcc.Tab(label='Deaths', value='deaths', style=LABEL)
+            dcc.Tab(label='Apprehensions', value='apps', style=tab_style, selected_style=tab_selected_style),
+            dcc.Tab(label='Deaths', value='deaths', style=tab_style, selected_style=tab_selected_style)
         ])
     ]),
+    html.Br(),
     dbc.Container([
         dbc.Row([
             dbc.Col([
@@ -144,7 +165,12 @@ layout=html.Div([
                         optionHeight=90
                     )
                 ])
-            ])
+            ]),
+            dbc.Col([
+                html.Div([
+                    dbc.Button('Edit Graph', id='edit-southwest', outline=True, color="primary", className="me-1", value='southwest')
+                ])
+            ], width=2)
         ])
     ]),
     dbc.Container([
@@ -161,6 +187,26 @@ layout=html.Div([
     ])
 ])
 @app.callback(
+    Output('sidebar-space','children'),
+    [Input('edit-yearly','n_clicks'),
+    Input('sidebar-space','children'),
+    Input('app-tabs','value')]
+)
+def get_sidebar(button, sidebarSpace, currentTabApp):
+    trigger_id=ctx.triggered_id
+    sidebar=html.Div()
+    show=show_sidebar
+    if(trigger_id=='edit-yearly'):
+        sidebar=generate_sidebar('Yearly Apprehensions Chart')
+        if(currentTabApp=='tab-cit'):
+            current=df_cit
+            previous=df_cit
+            
+        
+    return sidebar
+
+
+@app.callback(
     [Output('apprehensions-graph', 'figure'),
     Output('select-sector','options'),
     Output('select-sector','value'),
@@ -169,7 +215,8 @@ layout=html.Div([
     Output('monthly-graph','figure'),
     Output('south-sector','options'),
     Output('south-sector','value'),
-    Output('south-graph','figure')],
+    Output('south-graph','figure'),
+    ],
     [Input('select-sector','value'),
     Input('select-sector','options'),
     Input('app-tabs','value'),
@@ -178,9 +225,12 @@ layout=html.Div([
     Input('sector-monthly','value'),
     Input('south-tabs','value'),
     Input('south-sector','options'),
-    Input('south-sector','value')]
+    Input('south-sector','value'),
+    Input('edit-yearly','value'),
+    Input('edit-monthly','value'),
+    Input('edit-southwest','value')]
 )
-def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptions, monthlyValue, southTab, southOptions, southValue):
+def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptions, monthlyValue, southTab, southOptions, southValue, yearlyButton, monthlyButton, southwestButton):
     #Chunk for section 1:
     trigger_id=ctx.triggered_id
     if(currentTab=='tab-cit'):
@@ -189,6 +239,7 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
             sectorOptions=get_options(dff, 'Sector')
             sectorValue=dff['Sector'].unique()[0]
         fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Apprehensions', color='Citizenship')
+        fig.update_xaxes(rangeslider_visible=True)
     if(currentTab=='tab-country'):
         dff=df_country.copy()
         if(trigger_id=='app-tabs'):
@@ -223,4 +274,5 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
             southOptions=get_options(dff3, 'Sector')
             southValue=dff3['Sector'].unique()[0]
         fig3=px.line(filter_df(dff3, 'Sector', southValue), x='Year', y='Deaths')
+    
     return fig, sectorOptions, sectorValue, monthlyOptions, monthlyValue, fig2, southOptions, southValue, fig3

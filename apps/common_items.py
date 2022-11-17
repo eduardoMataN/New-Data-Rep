@@ -56,6 +56,7 @@ LABEL={'font-weight':'bold', 'color':'#041E42'}
 TITLE={'color':'#041E42'}
 DROPDOWN={'width':'100%'}
 
+
 tab_style = {
     'borderBottom': '1px solid #d6d6d6',
     'padding': '6px',
@@ -70,6 +71,20 @@ tab_selected_style = {
     'padding': '6px'
 }
 
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "16rem",
+    "padding": "2rem 1rem",
+    "background-color": "#f8f9fa",
+}
+CONTENT_STYLE = {
+    "margin-left": "18rem",
+    "margin-right": "2rem",
+    "padding": "2rem 1rem",
+}
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
  #Once we're on that path, we go into datasets. 
 def create_subplot(fig,row, col, df, xaxes, yaxes, names):
@@ -109,6 +124,56 @@ def get_colors(legend):
         else:
             final_color_list.append(legend_colors[i])
     return final_color_list
+def generate_sidebar(title):
+    sidebar=html.Div(
+    [
+        html.H6(title),
+        html.Hr(),
+        html.P(
+            "Use the following buttons to edit the chart.", className="lead"
+        ),
+        dbc.Nav(
+            [
+                dbc.NavLink("Percent Change", href="percent-change", active="exact"),
+                dbc.NavLink("Page 1", href="/page-1", active="exact"),
+                dbc.NavLink("Page 2", href="/page-2", active="exact"),
+            ],
+            vertical=True,
+            pills=True,
+        ),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        
+
+
+        dbc.Button('Hide', id='hide-button', outline=True, color="primary", className="me-1", value='hide', n_clicks=0 )
+    ],
+    style=SIDEBAR_STYLE,
+    )
+    return sidebar
 
 
 
