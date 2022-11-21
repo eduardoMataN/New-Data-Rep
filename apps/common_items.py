@@ -49,7 +49,14 @@ legend_colors={0:'#041E42',
             34:'#041E42',
             35:'#FB4E2D'
 }
-
+OPTION_BUTTONS=dbc.RadioItems(
+            id='chart-options',
+            options=[
+                {'label':'Percent Change','value':'percent-change'},
+                {'label': 'Original Chart','value':'original'}
+            ],
+            value='original'
+        )
 blue='#041E42'
 orange='#FF8200'
 LABEL={'font-weight':'bold', 'color':'#041E42'}
@@ -132,15 +139,8 @@ def generate_sidebar(title):
         html.P(
             "Use the following buttons to edit the chart.", className="lead"
         ),
-        dbc.Nav(
-            [
-                dbc.NavLink("Percent Change", href="percent-change", active="exact"),
-                dbc.NavLink("Original Chart", href="original", active="exact"),
-                dbc.NavLink("Page 2", href="/page-2", active="exact"),
-            ],
-            vertical=True,
-            pills=True,
-        ),
+        OPTION_BUTTONS,
+        
         html.Br(),
         html.Br(),
         html.Br(),

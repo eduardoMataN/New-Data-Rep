@@ -219,7 +219,7 @@ def get_sidebar(button, sidebarSpace, currentTabApp):
 
 @app.callback(
     Output('dummy','children'),
-    [Input('sidebar-location', 'pathname'),
+    [Input('chart-options', 'value'),
     Input('dummy1', 'children')]
 )
 def update_chart(pathname, title):
