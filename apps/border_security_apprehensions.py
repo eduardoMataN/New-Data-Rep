@@ -16,10 +16,15 @@ from apps.dataset import *
 DATA_PATH = PATH.joinpath("../datasets/Apprehensions").resolve()
 
 df_cit=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Citizenship.xlsx'))
-citDataset=dataset('Yearly Apprehensions by Citizenship', df_cit, df_cit['Apprehensions'].pct_change())
+df_cit_per=df_cit.copy()
+df_cit_per['Apprehensions']=df_cit_per['Apprehensions'].pct_change()
+citDataset=dataset('Yearly Apprehensions by Citizenship', df_cit, df_cit_per)
 
 df_country=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Country.xlsx'))
-countryDataset=dataset('Yearly Apprehensions by Country', df_country, df_country['Illegal Alien Apprehensions'].pct_change())
+df_country_per=df_country.copy()
+df_country_per['Illegal Alien Apprehensions']=df_country_per['Illegal Alien Apprehensions'].pct_change()
+countryDataset=dataset('Yearly Apprehensions by Country', df_country, df_country_per)
+
 
 df_uac=pd.read_excel(DATA_PATH.joinpath('Monthly UAC Apprehensions by Sector.xlsx'))
 
@@ -32,6 +37,15 @@ df_southwestb=pd.read_excel(DATA_PATH.joinpath('Southwest Border Deaths.xlsx'))
 current=df_cit.copy()
 previous=df_cit.copy()
 show_sidebar=True
+OPTION_BUTTONS=dbc.RadioItems(
+            id='chart-options',
+            options=[
+                {'label':'Percent Change','value':'percent-change'},
+                {'label': 'Original Chart','value':'original'}
+            ],
+            value='original',
+            
+        )
 
 
 layout=html.Div([
@@ -39,8 +53,56 @@ layout=html.Div([
     html.Div(id='dummy',children=[], hidden=True),
     html.Div(dcc.Location(id='sidebar-location',refresh=False)),
     html.Div(id='sidebar-space',children=[
+        html.Div(
+    [
+        html.H6(id='sidebar-title',children='Chart'),
+        html.Hr(),
+        html.P(
+            "Use the following buttons to edit the chart.", className="lead"
+        ),
+        dbc.RadioItems(
+            id='chart-options',
+            options=[
+                {'label':'Percent Change','value':'percent-change'},
+                {'label': 'Original Chart','value':'original'}
+            ],
+            value='original',
+            
+        ),
         
-    ]),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        
+
+
+        dbc.Button('Hide', id='hide-button', outline=True, color="primary", className="me-1", value='hide', n_clicks=0 )
+    ],
+    style=SIDEBAR_STYLE,
+    )
+    ], hidden=True),
     html.Br(),
     dbc.Container([
         dbc.Row([
@@ -197,8 +259,9 @@ layout=html.Div([
     ])
 ])
 @app.callback(
-    [Output('sidebar-space','children'),
-    Output('dummy1','children')],
+    [Output('sidebar-space','hidden'),
+    Output('dummy1','children'),
+    Output('sidebar-title','children')],
     [Input('edit-yearly','n_clicks'),
     Input('sidebar-space','children'),
     Input('app-tabs','value')]
@@ -206,16 +269,17 @@ layout=html.Div([
 def get_sidebar(button, sidebarSpace, currentTabApp):
     trigger_id=ctx.triggered_id
     sidebar=html.Div()
-    show=show_sidebar
+    sideBarShow=True
     title=''
     if(trigger_id=='edit-yearly'):
+        sideBarShow=False
         if(currentTabApp=='tab-cit'):
             title='Yearly Apprehensions by Citizenship Chart'
-            sidebar=generate_sidebar('Yearly Apprehensions by Citizenship Chart')
+            sidebar=generate_sidebar('Yearly Apprehensions by Citizenship Chart', OPTION_BUTTONS)
         else:
             title='Yearly Apprehensions by Country Chart'
-            sidebar=generate_sidebar('Yearly Apprehensions by Country Chart')      
-    return sidebar, title
+            sidebar=generate_sidebar('Yearly Apprehensions by Country Chart', OPTION_BUTTONS)      
+    return sideBarShow, title, title
 
 @app.callback(
     Output('dummy','children'),
@@ -257,9 +321,10 @@ def update_chart(pathname, title):
     Input('south-sector','value'),
     Input('edit-yearly','value'),
     Input('edit-monthly','value'),
-    Input('edit-southwest','value')]
+    Input('edit-southwest','value'),
+    Input('chart-options','value')]
 )
-def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptions, monthlyValue, southTab, southOptions, southValue, yearlyButton, monthlyButton, southwestButton):
+def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptions, monthlyValue, southTab, southOptions, southValue, yearlyButton, monthlyButton, southwestButton, chartType):
     #Chunk for section 1:
     trigger_id=ctx.triggered_id
     if(currentTab=='tab-cit'):
@@ -267,14 +332,14 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
         if(trigger_id=='app-tabs'):
             sectorOptions=get_options(dff, 'Sector')
             sectorValue=dff['Sector'].unique()[0]
-        fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Apprehensions', color='Citizenship')
+        fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Apprehensions', color='Citizenship', color_discrete_sequence=get_colors(dff['Citizenship'].unique()))
         fig.update_xaxes(rangeslider_visible=True)
     if(currentTab=='tab-country'):
         dff=countryDataset.getActive().copy()
         if(trigger_id=='app-tabs'):
             sectorOptions=get_options(dff, 'Sector')
             sectorValue=dff['Sector'].unique()[0]
-        fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Illegal Alien Apprehensions', color='Country')   
+        fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Illegal Alien Apprehensions', color='Country', color_discrete_sequence=get_colors(dff['Country'].unique()))   
     
     #Chunk for section 2:
     if(monthlyTab=='family-unit'):

@@ -4,8 +4,9 @@ class dataset:
     df_active=None
     title=''
     def __init__(self, title, df_original, df_percent_change):
-        self.df=df_original
+        self.df_original=df_original
         self.title=title
+        self.df_percent_change=df_percent_change
         self.df_active=df_original
 
     def activateDataframe(self, mode):

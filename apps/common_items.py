@@ -125,13 +125,13 @@ def sum_df(df, sumCol, sumBy, target):
 def get_colors(legend):
     final_color_list=[]
     for i in range(0, len(legend)):
-        if(i>len(legend_colors)):
+        if(i>len(legend_colors)-1):
             r = lambda: random.randint(0,255)
             final_color_list.append('#%02X%02X%02X' % (r(),r(),r()))
         else:
             final_color_list.append(legend_colors[i])
     return final_color_list
-def generate_sidebar(title):
+def generate_sidebar(title, buttons):
     sidebar=html.Div(
     [
         html.H6(id='sidebar-title',children=title),
@@ -139,7 +139,7 @@ def generate_sidebar(title):
         html.P(
             "Use the following buttons to edit the chart.", className="lead"
         ),
-        OPTION_BUTTONS,
+        buttons,
         
         html.Br(),
         html.Br(),
