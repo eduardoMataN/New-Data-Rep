@@ -37,15 +37,7 @@ df_southwestb=pd.read_excel(DATA_PATH.joinpath('Southwest Border Deaths.xlsx'))
 current=df_cit.copy()
 previous=df_cit.copy()
 show_sidebar=True
-OPTION_BUTTONS=dbc.RadioItems(
-            id='chart-options',
-            options=[
-                {'label':'Percent Change','value':'percent-change'},
-                {'label': 'Original Chart','value':'original'}
-            ],
-            value='original',
-            
-        )
+
 
 
 layout=html.Div([
