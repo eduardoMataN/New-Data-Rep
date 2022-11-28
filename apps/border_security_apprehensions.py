@@ -256,21 +256,56 @@ layout=html.Div([
     Output('sidebar-title','children')],
     [Input('edit-yearly','n_clicks'),
     Input('sidebar-space','children'),
-    Input('app-tabs','value')]
+    Input('app-tabs','value'),
+    Input('edit-monthly','n_clicks'),
+    Input('monthly-tabs', 'value'),
+    Input('sidebar-space','hidden'),
+    Input('edit-southwest','n_clicks'),
+    Input('south-tabs','value')]
 )
-def get_sidebar(button, sidebarSpace, currentTabApp):
+def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, sideBarShow, southButton, southTabs):
     trigger_id=ctx.triggered_id
     sidebar=html.Div()
     sideBarShow=True
     title=''
+    
+        
     if(trigger_id=='edit-yearly'):
-        sideBarShow=False
+        if(sideBarShow):
+            sideBarShow=False
+        else:
+            sideBarShow=True
+        
         if(currentTabApp=='tab-cit'):
             title='Yearly Apprehensions by Citizenship Chart'
-            sidebar=generate_sidebar('Yearly Apprehensions by Citizenship Chart', OPTION_BUTTONS)
+            
         else:
             title='Yearly Apprehensions by Country Chart'
-            sidebar=generate_sidebar('Yearly Apprehensions by Country Chart', OPTION_BUTTONS)      
+            
+    if(trigger_id=='edit-monthly'):
+        if(sideBarShow):
+            sideBarShow=False
+        else:
+            sideBarShow=True
+        
+        if(monthlyTab=='family-unit'):
+            title='Family Unit Monthly Apprehensions by Sector Chart'     
+        else:
+            title='AUC Monthly Apprehensions Chart'
+    if(trigger_id=='edit-southwest'):
+        if(sideBarShow):
+            sideBarShow=False
+        else:
+            sideBarShow=True
+        
+        if(southTabs=='apps'):
+            title='Family Unit Monthly Apprehensions by Sector Chart'     
+        else:
+            title='AUC Monthly Apprehensions Chart'
+    
+    
+
+         
     return sideBarShow, title, title
 
 @app.callback(
