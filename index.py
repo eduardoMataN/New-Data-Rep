@@ -13,85 +13,85 @@ from app import app
 from app import server
 
 from apps import border_security, common_items, demographic_indicators, economic_indicators_trade, education, social_indicators, transportation, transportation_border_crossings, economic_indicators_income, demographic_indicators_population, economic_indicators_employment, economic_indicators_industry, economic_indicators_remittances, social_indicators_crime, transportation_airport_activity, education_educational_attaintment_rate, social_indicators_poverty, border_security_apprehensions, border_security_staffing, border_security_migration
-app.layout=html.Div(children=[dcc.Location(id='url', refresh=False),# type: ignore
+app.layout=html.Div(children=[dcc.Location(id='url', refresh=False),
     dbc.NavbarSimple(children=[
     dbc.DropdownMenu(
         [
-            dbc.DropdownMenuItem('Sub1',href='/apps/demographic_indicators'), # type: ignore
-            dbc.DropdownMenuItem('Population', href='/apps/demographic_indicators_population') # type: ignore
+            dbc.DropdownMenuItem('Sub1',href='/apps/demographic_indicators'), 
+            dbc.DropdownMenuItem('Population', href='/apps/demographic_indicators_population') 
         ],
-        label='Demographic Indicators',# type: ignore
+        label='Demographic Indicators',
         toggle_style={
-            'background':'#041E42',# type: ignore
+            'background':'#041E42',
             'border':'#041E42'
         }
     ),
-    dbc.DropdownMenu([# type: ignore
-        dbc.DropdownMenuItem('International Trade Flows',href='/apps/economic_indicators_trade'),# type: ignore
-        dbc.DropdownMenuItem('Income', href='/apps/economic_indicators_income'),# type: ignore
-        dbc.DropdownMenuItem('Employment', href='/apps/economic_indicators_employment'),# type: ignore
-        dbc.DropdownMenuItem('Industry', href='/apps/economic_indicators_industry'),# type: ignore
-        dbc.DropdownMenuItem('Remittances', href='/apps/economic_indicators_remittances')# type: ignore
+    dbc.DropdownMenu([
+        dbc.DropdownMenuItem('International Trade Flows',href='/apps/economic_indicators_trade'),
+        dbc.DropdownMenuItem('Income', href='/apps/economic_indicators_income'),
+        dbc.DropdownMenuItem('Employment', href='/apps/economic_indicators_employment'),
+        dbc.DropdownMenuItem('Industry', href='/apps/economic_indicators_industry'),
+        dbc.DropdownMenuItem('Remittances', href='/apps/economic_indicators_remittances')
     ],
-    label='Economic Indicators',# type: ignore
+    label='Economic Indicators',
     toggle_style={
-            'background':'#041E42',# type: ignore
-            'border':'#041E42'# type: ignore
+            'background':'#041E42',
+            'border':'#041E42'
         }),
     dbc.DropdownMenu(
         [
-            dbc.DropdownMenuItem('Apprehensions', href='/apps/border_security_apprehensions'),# type: ignore
+            dbc.DropdownMenuItem('Apprehensions', href='/apps/border_security_apprehensions'),
             dbc.DropdownMenuItem('Border Patrol Agent Staffing', href='/apps/border_security_staffing'),
             dbc.DropdownMenuItem('Migration Indicators', href='/apps/border_security_migration')
             
         ],
-        label='Border Security',# type: ignore
+        label='Border Security',
         toggle_style={
-            'background':'#041E42',# type: ignore
-            'border':'#041E42'
-        }# type: ignore
-    ),
-    dbc.DropdownMenu(
-        [
-            dbc.DropdownMenuItem('Educational Attaintment', href='/apps/education_educational_attaintment_rate')# type: ignore
-        ],
-        label='Education', # type: ignore
-        toggle_style={
-            'background':'#041E42',# type: ignore
+            'background':'#041E42',
             'border':'#041E42'
         }
     ),
     dbc.DropdownMenu(
         [
-            dbc.DropdownMenuItem('Crime', href='/apps/social_indicators_crime'),# type: ignore
-            dbc.DropdownMenuItem('Poverty', href='/apps/social_indicators_poverty')# type: ignore
+            dbc.DropdownMenuItem('Educational Attaintment', href='/apps/education_educational_attaintment_rate')
         ],
-        label='Social Indicators',# type: ignore
+        label='Education', 
         toggle_style={
-            'background':'#041E42',# type: ignore
+            'background':'#041E42',
+            'border':'#041E42'
+        }
+    ),
+    dbc.DropdownMenu(
+        [
+            dbc.DropdownMenuItem('Crime', href='/apps/social_indicators_crime'),
+            dbc.DropdownMenuItem('Poverty', href='/apps/social_indicators_poverty')
+        ],
+        label='Social Indicators',
+        toggle_style={
+            'background':'#041E42',
             'border':'#041E42'
         }
 
     ),
     dbc.DropdownMenu(
         [
-            dbc.DropdownMenuItem('Border Crossings', href='/apps/transportation_border_crossings'),# type: ignore
-            dbc.DropdownMenuItem('Airport Activity', href='/apps/transportation_airport_activity')# type: ignore
+            dbc.DropdownMenuItem('Border Crossings', href='/apps/transportation_border_crossings'),
+            dbc.DropdownMenuItem('Airport Activity', href='/apps/transportation_airport_activity')
         ],
-        label='Transportation',# type: ignore
+        label='Transportation',
         toggle_style={
-            'background':'#041E42',# type: ignore
-            'border':'#041E42'# type: ignore
+            'background':'#041E42',
+            'border':'#041E42'
         }
     )
         ],
-        brand='HIBRED',# type: ignore
-        brand_href='#',# type: ignore
-        color='#041E42',# type: ignore
-        style={'font-weight':'bold'},# type: ignore
-        className='navbar-dark'# type: ignore
+        brand='HIBRED',
+        brand_href='#',
+        color='#041E42',
+        style={'font-weight':'bold'},
+        className='navbar-dark'
         ),
-        html.Div(id='page-content', children=[])# type: ignore
+        html.Div(id='page-content', children=[])
 ])
 
 @app.callback(Output(component_id='page-content', component_property='children'), 

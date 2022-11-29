@@ -13,29 +13,34 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from apps.common_items import *
 from apps.dataset import *
+from apps.dataBag import *
 DATA_PATH = PATH.joinpath("../datasets/Apprehensions").resolve()
 
 df_cit=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Citizenship.xlsx'))
 df_cit_per=df_cit.copy()
 df_cit_per['Apprehensions']=df_cit_per['Apprehensions'].pct_change()
-citDataset=dataset('Yearly Apprehensions by Citizenship', df_cit, df_cit_per)
+citDataset=dataset('Yearly Apprehensions by Citizenship Chart', df_cit, 'Apprehensions','tab-cit')
 
 df_country=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Country.xlsx'))
 df_country_per=df_country.copy()
 df_country_per['Illegal Alien Apprehensions']=df_country_per['Illegal Alien Apprehensions'].pct_change()
-countryDataset=dataset('Yearly Apprehensions by Country', df_country, df_country_per)
+countryDataset=dataset('Yearly Apprehensions by Country Chart', df_country, 'Illegal Alien Apprehensions', 'tab-country')
 
 
 df_uac=pd.read_excel(DATA_PATH.joinpath('Monthly UAC Apprehensions by Sector.xlsx'))
+aucDataset=dataset('AUC Monthly Apprehensions Chart', df_uac, 'Unaccompanied Alien Children Apprehended', 'auc-app')
 
 df_family=pd.read_excel(DATA_PATH.joinpath('Monthly Family Unit Apprehensions.xlsx'))
+familyDataset=dataset('Family Unit Monthly Apprehensions by Sector Chart', df_family, 'Total','family-unit')
 
 df_southwesta=pd.read_excel(DATA_PATH.joinpath('Southwest Border Apprehensions.xlsx'))
+southwestAppDataset=dataset('Southwest Border Apprehensions Chart',df_southwesta, 'Total', 'apps')
 
 df_southwestb=pd.read_excel(DATA_PATH.joinpath('Southwest Border Deaths.xlsx'))
+southwestDeathDataset=dataset('Southwest Border Deaths Chart',df_southwestb, 'Deaths', 'deaths')
 
-current=df_cit.copy()
-previous=df_cit.copy()
+borderSecurityBag=dataBag([citDataset, countryDataset, aucDataset, familyDataset, southwestAppDataset, southwestDeathDataset])
+
 show_sidebar=True
 
 
@@ -55,10 +60,10 @@ layout=html.Div([
         dbc.RadioItems(
             id='chart-options',
             options=[
-                {'label':'Percent Change','value':'percent-change'},
-                {'label': 'Original Chart','value':'original'}
+                {'label':'Percent Change','value':'PercentChange'},
+                {'label': 'Original Chart','value':'Original'}
             ],
-            value='original',
+            value='Original',
             
         ),
         
@@ -266,7 +271,7 @@ layout=html.Div([
 def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, sideBarShow, southButton, southTabs):
     trigger_id=ctx.triggered_id
     sidebar=html.Div()
-    sideBarShow=True
+    
     title=''
     
         
@@ -277,10 +282,10 @@ def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, 
             sideBarShow=True
         
         if(currentTabApp=='tab-cit'):
-            title='Yearly Apprehensions by Citizenship Chart'
+            title=borderSecurityBag.getTitle(citDataset)
             
         else:
-            title='Yearly Apprehensions by Country Chart'
+            title=borderSecurityBag.getTitle(countryDataset)
             
     if(trigger_id=='edit-monthly'):
         if(sideBarShow):
@@ -289,9 +294,9 @@ def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, 
             sideBarShow=True
         
         if(monthlyTab=='family-unit'):
-            title='Family Unit Monthly Apprehensions by Sector Chart'     
+            title=borderSecurityBag.getTitle(familyDataset)  
         else:
-            title='AUC Monthly Apprehensions Chart'
+            title=borderSecurityBag.getTitle(aucDataset)
     if(trigger_id=='edit-southwest'):
         if(sideBarShow):
             sideBarShow=False
@@ -299,9 +304,9 @@ def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, 
             sideBarShow=True
         
         if(southTabs=='apps'):
-            title='Family Unit Monthly Apprehensions by Sector Chart'     
+            title=borderSecurityBag.getTitle(southwestAppDataset)    
         else:
-            title='AUC Monthly Apprehensions Chart'
+            title=borderSecurityBag.getTitle(southwestDeathDataset)
     
     
 
@@ -314,16 +319,10 @@ def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, 
     Input('dummy1', 'children')]
 )
 def update_chart(pathname, title):
-    if(pathname=='percent-change'):
-        if(title=='Yearly Apprehensions by Citizenship Chart'):
-            citDataset.activateDataframe('PercentChange')
-        if(title=='Yearly Apprehensions by Country Chart'):
-            countryDataset.activateDataframe('PercentChange')
-    if(pathname=='original'):
-        if(title=='Yearly Apprehensions by Citizenship Chart'):
-            citDataset.activateDataframe('Original')
-        if(title=='Yearly Apprehensions by Country Chart'):
-            countryDataset.activateDataframe('Original')
+    
+    borderSecurityBag.getDataframe(title).activateDataframe(pathname)
+    
+    
     return None
 
 @app.callback(
@@ -355,14 +354,14 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
     #Chunk for section 1:
     trigger_id=ctx.triggered_id
     if(currentTab=='tab-cit'):
-        dff=citDataset.getActive().copy()
+        dff=borderSecurityBag.getByName(currentTab).getActive().copy()
         if(trigger_id=='app-tabs'):
             sectorOptions=get_options(dff, 'Sector')
             sectorValue=dff['Sector'].unique()[0]
         fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Apprehensions', color='Citizenship', color_discrete_sequence=get_colors(dff['Citizenship'].unique()))
         fig.update_xaxes(rangeslider_visible=True)
     if(currentTab=='tab-country'):
-        dff=countryDataset.getActive().copy()
+        dff=borderSecurityBag.getByName(currentTab).getActive().copy()
         if(trigger_id=='app-tabs'):
             sectorOptions=get_options(dff, 'Sector')
             sectorValue=dff['Sector'].unique()[0]
@@ -370,30 +369,34 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
     
     #Chunk for section 2:
     if(monthlyTab=='family-unit'):
-        dff2=df_family.copy()
+        dff2=borderSecurityBag.getByName(monthlyTab).getActive().copy()
         if(trigger_id=='monthly-tabs'):
             monthlyOptions=get_options(dff2, 'Sector')
             monthlyValue=dff2['Sector'].unique()[0]
         fig2=px.line(filter_df(dff2, 'Sector',monthlyValue), x='Date', y='Total')
+        fig2.update_traces(line_color='#FF8200')
     if(monthlyTab=='auc-app'):
-        dff2=df_uac.copy()
+        dff2=borderSecurityBag.getByName(monthlyTab).getActive().copy()
         if(trigger_id=='monthly-tabs'):
             monthlyOptions=get_options(dff2, 'Sector')
             monthlyValue=dff2['Sector'].unique()[0]
         fig2=px.line(filter_df(dff2, 'Sector', monthlyValue), x='Date', y='Unaccompanied Alien Children Apprehended')
+        fig2.update_traces(line_color='#FF8200')
     
     #Chunk for section 3:
     if(southTab=='apps'):
-        dff3=df_southwesta.copy()
+        dff3=borderSecurityBag.getByName(southTab).getActive().copy()
         if(trigger_id=='south-tabs'):
             southOptions=get_options(dff3, 'Sector')
             southValue=dff3['Sector'].unique()[0]
         fig3=px.line(filter_df(dff3,'Sector',southValue), x='Fiscal Year', y='Total')
+        fig3.update_traces(line_color='#FF8200')
     if(southTab=='deaths'):
-        dff3=df_southwestb.copy()
+        dff3=borderSecurityBag.getByName(southTab).getActive().copy()
         if(trigger_id=='south-tabs'):
             southOptions=get_options(dff3, 'Sector')
             southValue=dff3['Sector'].unique()[0]
         fig3=px.line(filter_df(dff3, 'Sector', southValue), x='Year', y='Deaths')
+        fig3.update_traces(line_color='#FF8200')
     
     return fig, sectorOptions, sectorValue, monthlyOptions, monthlyValue, fig2, southOptions, southValue, fig3
