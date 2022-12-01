@@ -104,41 +104,7 @@ layout=html.Div(children=[
                     disabled=True)
                 ])
             ),
-            dbc.Col(
-                html.Div([
-                    html.Label('Indicator', style={'font-weight':'bold'}),
-                    dcc.Dropdown(id='select-indicator2',
-                    options=[{'label':x, 'value':x} for x in df_median['Indicator'].unique()],
-                    multi=False,
-                    value=df_median['Indicator'].tolist()[0],
-                    style={'width':'100%'},
-                    optionHeight=90)
-                ])
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Label('Household Type', style={'font-weight':'bold'}),
-                    dcc.Dropdown(id='select-household2',
-                    options=[{'label':x, 'value':x} for x in df_median['Household Type'].dropna().unique()],
-                    multi=False,
-                    value=df_median['Household Type'].dropna().unique()[0],
-                    style={'width':'100%'},
-                    optionHeight=90,
-                    disabled=True)
-                ])
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Label('Industry', style={'font-weight':'bold'}),
-                    dcc.Dropdown(id='select-industry2',
-                    options=[{'label':x, 'value':x} for x in df_median['Industry'].dropna().unique()],
-                    multi=False,
-                    value=df_median['Industry'].dropna().unique()[0],
-                    style={'width':'100%'},
-                    optionHeight=90,
-                    disabled=True)
-                ])
-            )
+            
         ])
     ]),
     dbc.Container(children=[
@@ -184,19 +150,8 @@ layout=html.Div(children=[
                     optionHeight=90)
                     
                 ])
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Label('Zip Code', style={'font-weight':'bold'}),
-                    dcc.Dropdown(id='select-zip2',
-                    options=[{'label':x, 'value':x} for x in df_income_zip['ZIP'].unique()],
-                    multi=False,
-                    value=df_income_zip['ZIP'].tolist()[1],
-                    style={'width':'100%'},
-                    optionHeight=90)
-                    
-                ])
             )
+            
         ])
     ]),
     dbc.Container(children=[
@@ -205,12 +160,8 @@ layout=html.Div(children=[
                 html.Div([
                     dcc.Graph(id='pie-income', figure={})
                 ])
-            ),
-            dbc.Col(
-                html.Div([
-                    dcc.Graph(id='pie2-income', figure={})
-                ])
             )
+            
         ])
     ]),
     dbc.Container(children=[
@@ -249,20 +200,19 @@ layout=html.Div(children=[
 
 )
 @app.callback(
-    [Output(component_id='median-graph', component_property='figure'), Output(component_id='select-household', component_property='disabled'), Output(component_id='select-household2', component_property='disabled'),
-    Output(component_id='select-industry', component_property='disabled'), Output(component_id='select-industry2', component_property='disabled'), Output(component_id='line-rev', component_property='figure')],
+    [Output(component_id='median-graph', component_property='figure'), Output(component_id='select-household', component_property='disabled'),
+    Output(component_id='select-industry', component_property='disabled'), Output(component_id='line-rev', component_property='figure')],
     [Input(component_id='select-indicator', component_property='value'), Input(component_id='select-household', component_property='value'),
-    Input(component_id='select-indicator2', component_property='value'), Input(component_id='select-household2', component_property='value'),
-    Input(component_id='select-industry', component_property='value'), Input(component_id='select-industry2', component_property='value')]
+    Input(component_id='select-industry', component_property='value')]
 )
-def update_median(ind, household, ind2, household2, industry, industry2):
+def update_median(ind, household, industry):
     drop1=True
-    drop2=True
+    
     drop3=True
-    drop4=True
+    
     dff=df_median.copy()
-    dff2=df_median.copy()
-    fig=make_subplots(rows=1, cols=2)
+    
+    fig=make_subplots(rows=1, cols=1)
     if(ind=='Personal Per Capita Income'):
         drop1=True
         df_temp=dff[dff['Indicator']==ind]
@@ -272,15 +222,8 @@ def update_median(ind, household, ind2, household2, industry, industry2):
             x=df_ind['Year']
             y=df_ind['Income']
             fig.add_trace(go.Scatter(x=x, y=y, name=county), row=1, col=1)
-    if(ind2=='Personal Per Capita Income'):
-        drop2=True
-        df_temp=dff2[dff2['Indicator']==ind2]
-        counties=df_temp['County'].unique()
-        for county in counties:
-            df_ind2=df_temp[df_temp['County']==county]
-            x=df_ind2['Year']
-            y=df_ind2['Income']
-            fig.add_trace(go.Scatter(x=x,y=y, name=county), row=1, col=2)
+        fig.update_xaxes(rangeslider_visible=True)
+    
     if (ind=='Median Household Income'):
         drop1=False
         df_temp=dff[dff['Indicator']==ind]
@@ -290,15 +233,8 @@ def update_median(ind, household, ind2, household2, industry, industry2):
             x=df_ind['Year']
             y=df_ind['Income']
             fig.add_trace(go.Scatter(x=x, y=y, name=county), row=1, col=1)
-    if (ind2=='Median Household Income'):
-        drop2=False
-        df_temp=dff2[dff2['Indicator']==ind2]
-        counties=df_temp['County'].unique()
-        for county in counties:
-            df_ind2=df_temp[(df_temp['County']==county) & (df_temp['Household Type']==household2)]
-            x=df_ind2['Year']
-            y=df_ind2['Income']
-            fig.add_trace(go.Scatter(x=x, y=y, name=county), row=1, col=2)
+        fig.update_xaxes(rangeslider_visible=True)
+    
     if (ind=='Earnings by Industry'):
         drop3=False
         df_temp=dff[dff['Indicator']==ind]
@@ -309,18 +245,11 @@ def update_median(ind, household, ind2, household2, industry, industry2):
             x=df_ind['Year']
             y=df_ind['Income'].dropna()
             fig.add_trace(go.Scatter(x=x, y=y, name=county), row=1, col=1)
-    if (ind2=='Earnings by Industry'):
-        drop4=False
-        df_temp2=dff2[dff2['Indicator']==ind2]
-        counties=df_temp2['County'].unique()
-        for county in counties:
-            df_ind2=df_temp2[(df_temp2['County']==county) & (df_temp2['Industry']==industry2)]
-            x=df_ind2['Year']
-            y=df_ind2['Income'].dropna()
-            fig.add_trace(go.Scatter(x=x, y=y, name=county), row=1, col=2)
+        fig.update_xaxes(rangeslider_visible=True)
     fig3=px.line(df_revenues, x='Date', y='Dollars in Millions')
     fig3.update_layout(yaxis_tickprefix='$')
-    return fig, drop1, drop2, drop3, drop4, fig3
+    fig3.update_xaxes(rangeslider_visible=True)
+    return fig, drop1, drop3, fig3
 
 
 
@@ -328,29 +257,29 @@ def update_median(ind, household, ind2, household2, industry, industry2):
 
 
 @app.callback(
-    [Output(component_id='pie-income', component_property='figure'), Output(component_id='pie2-income', component_property='figure'),
+    [Output(component_id='pie-income', component_property='figure'),
     Output(component_id='pie-ep', component_property='figure'), Output(component_id='pie-tx', component_property='figure')],
     [Input(component_id='select-zip', component_property='value'), 
     Input(component_id='select-year', component_property='value'),
-    Input(component_id='select-zip2', component_property='value')]
+    ]
 )
-def update_pie(zip, year, zip2):
+def update_pie(zip, year):
     dff=df_income.copy()
     df_zip=dff[~dff['ZIP'].isin(['Texas', 'El Paso County, Texas'])]
     df_overall=dff[dff['ZIP'].isin(['Texas', 'El Paso County, Texas'])]
-    df_zip2=dff[~dff['ZIP'].isin(['Texas', 'El Paso County, Texas'])]
+    
 
 
     df_zip=df_zip[(df_zip['ZIP']==zip) & (df_zip['Year']==year)]
-    df_zip2=df_zip2[(df_zip2['ZIP']==zip2) & (df_zip2['Year']==year)]
+    
     df_ep=df_overall[(df_overall['ZIP']== 'El Paso County, Texas') & (df_overall['Year']==year)]
     df_tx=df_overall[(df_overall['ZIP']== 'Texas') & (df_overall['Year']==year)]
     fig=px.pie(df_zip, values='Income', names='HouseholdsTypes')
-    fig2=px.pie(df_zip2, values='Income', names='HouseholdsTypes')
+    
     fig_ep=px.pie(df_ep, values='Income', names='HouseholdsTypes', title='El Paso Households Income', color_discrete_sequence=px.colors.sequential.Sunset)
     fig_tx=px.pie(df_tx, values='Income', names='HouseholdsTypes', title='Texas Household Income', color_discrete_sequence=px.colors.sequential.Sunset)
 
-    return fig, fig2, fig_ep, fig_tx
+    return fig,  fig_ep, fig_tx
 
 
 

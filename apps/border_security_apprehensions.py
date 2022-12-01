@@ -365,7 +365,9 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
         if(trigger_id=='app-tabs'):
             sectorOptions=get_options(dff, 'Sector')
             sectorValue=dff['Sector'].unique()[0]
-        fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Illegal Alien Apprehensions', color='Country', color_discrete_sequence=get_colors(dff['Country'].unique()))   
+        fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Illegal Alien Apprehensions', color='Country', color_discrete_sequence=get_colors(dff['Country'].unique()))
+        fig.update_xaxes(rangeslider_visible=True)   
+        fig.update_layout(xaxis=dict(range=[x[0],x[-1]],rangeslider=dict(range=[x[0],x[-1]])))
     
     #Chunk for section 2:
     if(monthlyTab=='family-unit'):
@@ -382,6 +384,7 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
             monthlyValue=dff2['Sector'].unique()[0]
         fig2=px.line(filter_df(dff2, 'Sector', monthlyValue), x='Date', y='Unaccompanied Alien Children Apprehended')
         fig2.update_traces(line_color='#FF8200')
+    fig2.update_xaxes(rangeslider_visible=True)
     
     #Chunk for section 3:
     if(southTab=='apps'):
@@ -398,5 +401,6 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
             southValue=dff3['Sector'].unique()[0]
         fig3=px.line(filter_df(dff3, 'Sector', southValue), x='Year', y='Deaths')
         fig3.update_traces(line_color='#FF8200')
+    fig3.update_xaxes(rangeslider_visible=True)
     
     return fig, sectorOptions, sectorValue, monthlyOptions, monthlyValue, fig2, southOptions, southValue, fig3
