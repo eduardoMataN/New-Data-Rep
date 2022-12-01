@@ -164,13 +164,13 @@ layout=html.Div(children=[
         Output('employment-graph', 'figure')
     ],
     [
-        Input(component_id='emp-monthly-pw', component_property='on'), Input(component_id='unemp-monthly-pw', component_property='on'),
-        Input(component_id='emp-county-select', component_property='value'), Input(component_id='unemp-county-select', component_property='value'),
+        Input(component_id='emp-monthly-pw', component_property='on'),
+        Input(component_id='emp-county-select', component_property='value'),
         Input(component_id='emp-year-select', component_property='value'), Input(component_id='unemp-year-select', component_property='value'),
         Input(component_id='emp-month-select', component_property='value'), Input(component_id='unemp-month-select', component_property='value')
     ]
 )
-def update_data(empPw, unemPw, countyEmp, countyUnemp, yearEmp, yearUnemp, monthEmp, monthUnemp):
+def update_data(empPw, countyEmp, yearEmp, yearUnemp, monthEmp, monthUnemp):
     emp=0
     unemp=0
     dfemp=df_total.copy()
@@ -183,15 +183,10 @@ def update_data(empPw, unemPw, countyEmp, countyUnemp, yearEmp, yearUnemp, month
     else:
         monthSE=True
         emp=sum(dfemp[(dfemp['County']==countyEmp) & (dfemp['Year']==yearEmp)]['Value'])
-    if(unemPw):
-        monthSU=False
-        unemp=sum(dfunemp[(dfunemp['County']==countyUnemp) & (dfunemp['Year']==yearUnemp) & (dfunemp['Month']==monthUnemp)]['Unemployed'])
-    else:
-        monthSU=True
-        unemp=sum(dfunemp[(dfunemp['County']==countyUnemp) & (dfunemp['Year']==yearUnemp)]['Unemployed'])
+    
     dff=df_emp.copy()
     fig=make_subplots(2,1)
     fig=create_subplot(fig, 1, 1, filter_df(dff, 'County', countyEmp), 'Year', 'Value', 'Description')
-    fig=create_subplot(fig, 2, 1, filter_df(dff, 'County', countyUnemp), 'Year', 'Value', 'Description')
+    
     fig.update_layout(height=700)
     return emp, unemp, monthSE, monthSU, fig
