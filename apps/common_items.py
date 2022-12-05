@@ -12,6 +12,7 @@ from app import app
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+
 legend_colors={0:'#041E42',
             1:'#FF8200', 
             2:'#fff100', 

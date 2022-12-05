@@ -9,6 +9,9 @@ from dash.dependencies import Input, Output, State
 import pathlib
 import plotly.graph_objects as go
 from app import app
+from apps.common_items import *
+from apps.dataset import *
+from apps.dataBag import *
 
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
@@ -39,19 +42,60 @@ CONTENT_STYLE = {
 }
 
 layout=html.Div(children=[
-    
+    html.Div(id='sidebar-space-bc',children=[
+        html.Div(
+    [
+        html.H6(id='sidebar-title-bc',children='Border Crossings Chart'),
+        html.Hr(),
+        html.P(
+            "Use the following buttons to edit the chart.", className="lead"
+        ),
+        dbc.RadioItems(
+            id='chart-options-bc',
+            options=[
+                {'label':'Percent Change','value':'PercentChange'},
+                {'label': 'Original Chart','value':'Original'}
+            ],
+            value='Original',
+            
+        ),
+        
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        
+
+
+        
+    ],
+    style=SIDEBAR_STYLE,
+    )
+    ], hidden=True),
     dbc.Container([
         html.Br(),
         dbc.Row([
-            dbc.Col(
-                width=5
-            ),
-            dbc.Col(
-                html.Div([
-                    html.H1(id='section-title', children=['Border Security'], style={'color':'#041E42'})
-                ]),
-                width=4
-            ),
             dbc.Col([
                 html.Div([
                     dbc.Button(
@@ -63,82 +107,35 @@ layout=html.Div(children=[
                         size='sm'
                     ),
                     dbc.Popover(
-                        children='This first section displays information throughout the Years for each indicator by County. Use the sliders at the bottom to dicrease the Year range. You might also change the range of the Y axis using the input boxes. ',
+                        children='This first section displays information throughout the Years for each indicator by County. Use the slider at the bottom to change the range of the Y axis. You may also isolate a line by double clicking on its legend element. ',
                         target='click-target-1',
                         body=True,
                         trigger='click'
                     )
                 ])
-            ]),
+            ], width=1),
+            dbc.Col(
+                width=3
+            ),
+            dbc.Col(
+                html.Div([
+                    html.H1(id='section-title', children=['Border Security'], style={'color':'#041E42'})
+                ]),
+                width=4
+            ),
+            
+            dbc.Col(
+                html.Div([
+                    #html.Label(['Current'], style=LABEL),
+                    daq.LEDDisplay(id='Number1', value=initialValue, color='#FF8200', label={'label':'Current', 'style':LABEL}, labelPosition='bottom',)
+                ]),
+                
+            ),
             dbc.Col()
         ])
     ]),
-    dbc.Container(children=[
-        dbc.Row([
-            dbc.Col(
-                width=1
-            ),
-            dbc.Col(
-                html.Div([
-                    html.H1(id='County-Title', children=df['Measure'].tolist()[0], style={'color':'#041E42'})
-                    
-                ]),
-            ),
-            dbc.Col(
-                
-                
-            ),
-            
-            dbc.Col(
-                html.Div([
-                    html.H1(id='County-Title2', children=df['Measure'].tolist()[0], style={'color':'#041E42'})
-                ])
-            )
-            
-        ])
-    ]),
-    html.Br(),
-    dbc.Container(children=[
-        dbc.Row([
-            dbc.Col(
-                width=1
-            ),
-            dbc.Col(
-                html.Div([
-                    daq.LEDDisplay(id='Number1', value=initialValue, color='#FF8200')
-                ]),
-                
-            ),
-            dbc.Col(
-
-            ),
-            dbc.Col(
-                html.Div([
-                    daq.LEDDisplay(id='Number2', value=initialValue, color='#FF8200')
-                ]),
-
-            )
-        ]),
-        dbc.Row([
-            dbc.Col(
-                width=1
-            ),
-            dbc.Col(
-                html.Div([
-                    html.H3(id='Indic-Title', children='Current '+ df['Measure'].tolist()[0], style={'color':'#FF8200'})
-                ]),
-                
-            ),
-            dbc.Col(
-                width=4
-            ),
-            dbc.Col(
-                html.Div([
-                    html.H3(id='Indic-Title2', children='Current '+df['Measure'].tolist()[0], style={'color':'#FF8200'})
-                ])
-            )
-        ])
-    ]),
+    
+    
     html.Br(),
     dbc.Container(children=[
         dbc.Row([
@@ -157,23 +154,18 @@ layout=html.Div(children=[
                 ])
                 
             ),
-            dbc.Col(
+            dbc.Col([
                 html.Div([
-                    html.Label(['Indicator'], style={'font-weight':'bold','color':'#041E42'}),
-                    dcc.Dropdown(id='select-indicator2',
-                        options=[{'label':x, 'value':x} for x in sorted(df.Measure.unique())],
-                        multi=False,
-                        value=df['Measure'].tolist()[0],
-                        style={'width':'100%'},
-                        optionHeight=90)
+                    
+                    dbc.Button('Edit Graph', id='edit-bc', outline=True, color="primary", className="me-1", value='monthly')
                 ])
-            ),
+            ], width=2)
             
             
         ]),
 
     ]),
-    html.Br(),
+    
     dbc.Container(children=[
         dbc.Row([
             
@@ -273,18 +265,30 @@ layout=html.Div(children=[
     
 ]
 )
+@app.callback(
+    Output('sidebar-space-bc','hidden'),
+    [Input('edit-bc','n_clicks'),
+    Input('sidebar-space-bc','hidden')]
+)
+def show_sidebar(button, showSidebar):
+    trigger_id=ctx.triggered_id
+    if(trigger_id=='edit-bc'):
+        if(showSidebar):
+            showSider=False
+        else:
+            showSidebar=True
+    return showSidebar
+    
 
 @app.callback(
     [Output(component_id='graph', component_property='figure'), 
-    Output(component_id='County-Title', component_property='children'), Output(component_id='County-Title2', component_property='children'),
-    Output(component_id='Number1', component_property='value'), Output(component_id='Number2', component_property='value'),
-    Output(component_id='Indic-Title', component_property='children'), Output(component_id='Indic-Title2', component_property='children'),
+    Output(component_id='Number1', component_property='value'),  
     ],
-    [Input(component_id='select-indicator', component_property='value'),
-    Input(component_id='select-indicator2', component_property='value'),
-    ]
+    (Input(component_id='select-indicator', component_property='value'))
+    
+    
 )
-def update_indicator(indicator,  indicator2):
+def update_indicator(indicator):
     dff=df.copy()
     dff['Date'] = pd.to_datetime(df['Date'], format='%y%m')
     dff=dff[dff['Measure']==indicator]
@@ -299,9 +303,7 @@ def update_indicator(indicator,  indicator2):
     
     
 
-    dff2=df.copy()
-    dff['Date'] = pd.to_datetime(df['Date'], format='%y%m')
-    dff2=dff2[dff2['Measure']==indicator2]
+    
     
     
     
@@ -311,8 +313,8 @@ def update_indicator(indicator,  indicator2):
     
     
     dff=dff[dff['Year']==dff['Year'].max()]
-    dff2=dff2[dff2['Year']==dff2['Year'].max()] 
-    return fig, indicator, indicator2, sum(dff['Value']), sum(dff2['Value']), 'Current '+indicator, 'Current '+indicator2
+    
+    return fig, sum(dff['Value'])
 
 
 

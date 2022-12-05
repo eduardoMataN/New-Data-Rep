@@ -367,7 +367,7 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
             sectorValue=dff['Sector'].unique()[0]
         fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Illegal Alien Apprehensions', color='Country', color_discrete_sequence=get_colors(dff['Country'].unique()))
         fig.update_xaxes(rangeslider_visible=True)   
-        fig.update_layout(xaxis=dict(range=[x[0],x[-1]],rangeslider=dict(range=[x[0],x[-1]])))
+        #fig.update_layout(xaxis=dict(range=[x[0],x[-1]],rangeslider=dict(range=[x[0],x[-1]])))
     
     #Chunk for section 2:
     if(monthlyTab=='family-unit'):
