@@ -16,6 +16,8 @@ from apps.dataBag import *
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
 df= pd.read_excel(DATA_PATH.joinpath("Border Crossings.xlsx"))
+borderCDataSet=dataset('Border Crossings', df, 'Value', 'graph', 'Port', 'Value')
+boderDataBag=dataBag([borderCDataSet])
 df['Value']=pd.to_numeric(df['Value'])
 df_copy=df.copy()
 maxYear=df['Year'].max()
@@ -59,32 +61,6 @@ layout=html.Div(children=[
             value='Original',
             
         ),
-        
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
         
 
 
@@ -268,15 +244,17 @@ layout=html.Div(children=[
 @app.callback(
     Output('sidebar-space-bc','hidden'),
     [Input('edit-bc','n_clicks'),
-    Input('sidebar-space-bc','hidden')]
+    Input('sidebar-space-bc','hidden'),
+    Input('chart-options-bc','value')]
 )
-def show_sidebar(button, showSidebar):
+def show_sidebar(button, showSidebar, graphMode):
     trigger_id=ctx.triggered_id
     if(trigger_id=='edit-bc'):
         if(showSidebar):
-            showSider=False
+            showSidebar=False
         else:
             showSidebar=True
+    boderDataBag.getDataframe().activateDataframe(graphMode)
     return showSidebar
     
 
@@ -284,12 +262,13 @@ def show_sidebar(button, showSidebar):
     [Output(component_id='graph', component_property='figure'), 
     Output(component_id='Number1', component_property='value'),  
     ],
-    (Input(component_id='select-indicator', component_property='value'))
+    (Input(component_id='select-indicator', component_property='value'),
+    Input('chart-options-bc','value'))
     
     
 )
-def update_indicator(indicator):
-    dff=df.copy()
+def update_indicator(indicator, dummyValue):
+    dff=boderDataBag.getDataframe().getActive().copy()
     dff['Date'] = pd.to_datetime(df['Date'], format='%y%m')
     dff=dff[dff['Measure']==indicator]
     trigger_id=ctx.triggered_id

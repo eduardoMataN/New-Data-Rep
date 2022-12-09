@@ -19,25 +19,25 @@ DATA_PATH = PATH.joinpath("../datasets/Apprehensions").resolve()
 df_cit=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Citizenship.xlsx'))
 df_cit_per=df_cit.copy()
 df_cit_per['Apprehensions']=df_cit_per['Apprehensions'].pct_change()
-citDataset=dataset('Yearly Apprehensions by Citizenship Chart', df_cit, 'Apprehensions','tab-cit')
+citDataset=dataset('Yearly Apprehensions by Citizenship Chart', df_cit, 'Apprehensions','tab-cit', 'Citizenship', 'Apprehensions')
 
 df_country=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Country.xlsx'))
 df_country_per=df_country.copy()
 df_country_per['Illegal Alien Apprehensions']=df_country_per['Illegal Alien Apprehensions'].pct_change()
-countryDataset=dataset('Yearly Apprehensions by Country Chart', df_country, 'Illegal Alien Apprehensions', 'tab-country')
+countryDataset=dataset('Yearly Apprehensions by Country Chart', df_country, 'Illegal Alien Apprehensions', 'tab-country', 'Country', 'Illegal Alien Apprehensions')
 
 
 df_uac=pd.read_excel(DATA_PATH.joinpath('Monthly UAC Apprehensions by Sector.xlsx'))
-aucDataset=dataset('AUC Monthly Apprehensions Chart', df_uac, 'Unaccompanied Alien Children Apprehended', 'auc-app')
+aucDataset=dataset('AUC Monthly Apprehensions Chart', df_uac, 'Unaccompanied Alien Children Apprehended', 'auc-app', 'Sector', 'Unaccompanied Alien Children Apprehended')
 
 df_family=pd.read_excel(DATA_PATH.joinpath('Monthly Family Unit Apprehensions.xlsx'))
-familyDataset=dataset('Family Unit Monthly Apprehensions by Sector Chart', df_family, 'Total','family-unit')
+familyDataset=dataset('Family Unit Monthly Apprehensions by Sector Chart', df_family, 'Total','family-unit', 'Sector', 'Total')
 
 df_southwesta=pd.read_excel(DATA_PATH.joinpath('Southwest Border Apprehensions.xlsx'))
-southwestAppDataset=dataset('Southwest Border Apprehensions Chart',df_southwesta, 'Total', 'apps')
+southwestAppDataset=dataset('Southwest Border Apprehensions Chart',df_southwesta, 'Total', 'apps', 'Sector', 'Total')
 
 df_southwestb=pd.read_excel(DATA_PATH.joinpath('Southwest Border Deaths.xlsx'))
-southwestDeathDataset=dataset('Southwest Border Deaths Chart',df_southwestb, 'Deaths', 'deaths')
+southwestDeathDataset=dataset('Southwest Border Deaths Chart',df_southwestb, 'Deaths', 'deaths', 'Sector', 'Deaths')
 
 borderSecurityBag=dataBag([citDataset, countryDataset, aucDataset, familyDataset, southwestAppDataset, southwestDeathDataset])
 

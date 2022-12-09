@@ -12,12 +12,41 @@ from app import app
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from apps.common_items import *
+from apps.dataset import *
+from apps.dataBag import *
 
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
 df_edu=pd.read_excel(DATA_PATH.joinpath('Educational Attainment and Rate.xlsx'))
+educDataset=dataset('Educational Attainment Rate by County', df_edu, 'Value', 'line-edu', 'County','Value')
+educDatabag=dataBag([educDataset])
 
 layout=html.Div(children=[
+    html.Div(id='sidebar-space-educ',children=[
+        html.Div(
+    [
+        html.H6(id='sidebar-title-educ',children='Border Crossings Chart'),
+        html.Hr(),
+        html.P(
+            "Use the following buttons to edit the chart.", className="lead"
+        ),
+        dbc.RadioItems(
+            id='chart-options-educ',
+            options=[
+                {'label':'Percent Change','value':'PercentChange'},
+                {'label': 'Original Chart','value':'Original'}
+            ],
+            value='Original',
+            
+        ),
+        
+
+
+        
+    ],
+    style=SIDEBAR_STYLE,
+    )
+    ], hidden=True),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([
@@ -46,7 +75,13 @@ layout=html.Div(children=[
                     style=DROPDOWN,
                     optionHeight=90
                 )
-            ])
+            ]),
+            dbc.Col([
+                html.Div([
+                    
+                    dbc.Button('Edit Graph', id='edit-educ', outline=True, color="primary", className="me-1", value='edit')
+                ])
+            ], width=2)
         ])
     ]),
     dbc.Container([
@@ -93,6 +128,23 @@ layout=html.Div(children=[
         ])
     ])
 ])
+@app.callback(
+    
+    Output('sidebar-space-educ', 'hidden'),
+    [Input('edit-educ', 'n_clicks'),
+    Input('sidebar-space-educ', 'hidden'),
+    Input('chart-options-educ', 'value')]
+)
+def get_sidebar(button, showSideBar, chartMode):
+    trigger_id=ctx.triggered_id
+    if(trigger_id=='edit-educ'):
+        if(showSideBar):
+            showSideBar=False
+        else:
+            showSideBar=True
+    educDatabag.getDataframe().activateDataframe(chartMode)
+    return showSideBar
+    
 
 @app.callback(
     [Output('line-edu', 'figure'),
@@ -100,11 +152,12 @@ layout=html.Div(children=[
     Output('educ-table', 'columns')],
     [Input('select-county-edu','value'),
     Input('select-age-edu','value'),
-    Input('select-year-educ','value')]
+    Input('select-year-educ','value'),
+    Input('chart-options-educ','value')]
     
 )
-def update_data(county, age,year):
-    dff=df_edu.copy()
+def update_data(county, age,year, dummyValue):
+    dff=educDatabag.getDataframe().getActive().copy()
     fig=px.line(dff[(dff['County']==county)&(dff['Age']==age)], x='Year', y='Value', color='Educational Attainment')
     fig.update_xaxes( rangeslider_visible=True)
     toTable=df_edu[(df_edu['County']==county) &(df_edu['Age']==age)&(df_edu['Year']==year)][['Educational Attainment', 'Percentage']]

@@ -12,21 +12,60 @@ from app import app
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from apps.common_items import *
+from apps.dataset import *
+from apps.dataBag import *
 
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
 df_est=pd.read_excel(DATA_PATH.joinpath('Number of Establishments.xlsx'))
+stabDataset=dataset('Number of Business Stablishments by Year Chart', df_est, 'Value', 'stablishments', 'County', 'Value')
 toTable=df_est[df_est['Year']==df_est['Year'][0]][['County', 'Period', 'Value']]
 df_gdp=pd.read_excel(DATA_PATH.joinpath('GDP by Industry for Border Counties.xlsx'))
-
+gdpDatasetCounty=dataset('GDP by Industry for Border Counties Chart', df_gdp, 'GDP', 'gdpCounty', 'County', 'GDP')
+gdpDatasetCounty.modify_percent_change('County','Description', 'GDP')
+gdpDatasetIndustry=dataset('GDP by County for Industries Chart', df_gdp, 'GDP', 'gdpDesc', 'County', 'GDP')
+gdpDatasetIndustry.modify_percent_change('Description','County', 'GDP')
+industryDatabag=dataBag([stabDataset, gdpDatasetIndustry, gdpDatasetCounty])
 layout=html.Div(children=[
     dbc.Container(children=[
+        html.Div(id='sidebar-space-ind',children=[
+        html.Div(
+    [
+        html.H6(id='sidebar-title-ind',children='Number of Business Stablishments by Year'),
+        html.Hr(),
+        html.P(
+            "Use the following buttons to edit the chart.", className="lead"
+        ),
+        dbc.RadioItems(
+            id='chart-options-ind',
+            options=[
+                {'label':'Percent Change','value':'PercentChange'},
+                {'label': 'Original Chart','value':'Original'}
+            ],
+            value='Original',
+            
+        ),
+        
+
+
+        
+    ],
+    style=SIDEBAR_STYLE,
+    )
+    ], hidden=True),
         dbc.Row([
             dbc.Col(
                 html.Div([
                     html.H2(id='title',children=['Number of Business Stablishments by Year'], style={'color':blue})
                 ])
             )
+        ]),
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    dbc.Button('Edit Graph', id='edit-stablishments', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                ])
+            ], width=2)
         ]),
         dbc.Row([
             dbc.Col(
@@ -59,7 +98,8 @@ layout=html.Div(children=[
                         optionHeight=90
                     )
                 ])
-                    ])
+                    ]),
+            
         ]),
         html.Br(),
         dbc.Row(
@@ -146,7 +186,12 @@ layout=html.Div(children=[
                         disabled=True
                     )
                 ])
-            ])
+            ]),
+            dbc.Col([
+                html.Div([
+                    dbc.Button('Edit Graph', id='edit-gdp', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                ])
+            ], width=2)
         ])
     ]),
     dbc.Container([
@@ -169,6 +214,40 @@ layout=html.Div(children=[
         ])
     ])
 ])
+@app.callback(
+    [Output('sidebar-space-ind','hidden'),
+    Output('sidebar-title-ind','children')],
+    [Input('sidebar-space-ind', 'hidden'),
+    Input('edit-gdp','n_clicks'),
+    Input('edit-stablishments', 'n_clicks'),
+    Input('chart-options-ind','value'),
+    Input('county-button', 'on'),
+    Input('industry-button','on'),
+    Input('sidebar-title-ind','children')]
+)
+def get_sidebar(hideSideBar, button, button2, chartMode, countyButton, industryButton, title):
+    trigger_id=ctx.triggered_id
+    if(trigger_id=='edit-stablishments'):
+        if(hideSideBar):
+            hideSideBar=False
+        else:
+            hideSideBar=True
+        title=industryDatabag.get_title_by_name('stablishments')
+    if(trigger_id=='edit-gdp'):
+        if(hideSideBar):
+            hideSideBar=False
+        else:
+            hideSideBar=True
+        if(countyButton):
+            title=industryDatabag.get_title_by_name('gdpCounty')
+        if(industryButton):
+            title=industryDatabag.get_title_by_name('gdpDesc')
+    print(chartMode)
+    industryDatabag.getDataframe(title).activateDataframe(chartMode)
+        
+    
+            
+    return hideSideBar, title
 
 @app.callback(
     
@@ -187,12 +266,13 @@ layout=html.Div(children=[
         Input('county-button','on'),
         Input('select-county-gdp','value'),
         Input('industry-button', 'on'),
-        Input('select-industry-gdp','value')]
+        Input('select-industry-gdp','value'),
+        Input('chart-options-ind', 'value')]
     
 )
-def update_data(title, countyT,yearT, countyOn, countyValue, industryOn, industryValue):
+def update_data(title, countyT,yearT, countyOn, countyValue, industryOn, industryValue, dummyValue):
     trigger_id=ctx.triggered_id
-    dff=df_est.copy()
+    dff=industryDatabag.getByName('stablishments').getActive().copy()
     finalFig=px.line(sum_df(dff, 'County', 'Year', 'Value'), x='Year', y='Value', color='County', color_discrete_sequence=get_colors(dff['County'].unique()))
     finalFig.update_xaxes(nticks=len(pd.unique(dff['Year'])))
     finalFig.update_xaxes( rangeslider_visible=True)
@@ -215,12 +295,14 @@ def update_data(title, countyT,yearT, countyOn, countyValue, industryOn, industr
         industryOn=False
         
     if(countyOn):
+        dff2=industryDatabag.getByName('gdpCounty').getActive().copy()
         fig=px.line(filter_df(dff2, 'County', countyValue), x='Year', y='GDP', color='Description', color_discrete_sequence=get_colors(dff2['Description'].unique()))
         disableCounty=False
         disableIndustry=True
         countyOn=True
         industryOn=False
     if(industryOn):
+        dff2=industryDatabag.getByName('gdpDesc').getActive().copy()
         fig=px.line(filter_df(dff2, 'Description', industryValue), x='Year', y='GDP', color='County', color_discrete_sequence=get_colors(dff2['County'].unique()))
         disableCounty=True
         disableIndustry=False
