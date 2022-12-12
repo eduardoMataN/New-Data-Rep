@@ -61,6 +61,27 @@ layout=html.Div([
     dbc.Container([
         dbc.Row([
             dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Last Update: 2018', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4)
+                ], align='center', justify='center')
+            ], style={"border":"2px black solid"})
+            ]),
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
                 html.Div([
                     html.Label(['Migration Flow'], style=LABEL),
                     dcc.Dropdown(
@@ -147,4 +168,8 @@ def update_data(migrationFlow, view, dummyValue):
         dff=filter_df(dff, 'Migration', migrationFlow)
         fig=px.line(sum_df(dff, 'State', 'Year', 'Value'), x='Year', y='Value', color='State')
     fig.update_xaxes(rangeslider_visible=True)
+    if(dummyValue=='Original'):
+        fig.update_yaxes(tickprefix='$')
+    else:
+        fig.update_yaxes(ticksuffix='%', tickformat='000')
     return fig

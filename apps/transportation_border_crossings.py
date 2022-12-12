@@ -113,6 +113,30 @@ layout=html.Div(children=[
     
     
     html.Br(),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        
+                    ], width=2),
+                    dbc.Col([
+                        html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Last Update: June 2022', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3)
+                ], align='center', justify='center')
+            ], style={"border":"2px black solid"})
+            ]),
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col(
@@ -279,6 +303,9 @@ def update_indicator(indicator, dummyValue):
     
     fig=px.line(dff, x='Date', y='Value', title=indicator+' by Port ', color='Port')
     fig.update_xaxes(nticks=len(pd.unique(dff['Year'])), rangeslider_visible=True)
+    if(dummyValue=='PercentChange'):
+        fig.update_yaxes(ticksuffix='%')
+    
     
     
 

@@ -60,13 +60,30 @@ layout=html.Div(children=[
                 ])
             )
         ]),
+        html.Br(),
         dbc.Row([
+            dbc.Col([
+                html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Units: Thousands of Dollars (K)', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Last Update: 2022', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4)
+                ])
+            ], style={"border":"2px black solid"}),
+            ]),
             dbc.Col([
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-stablishments', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
-            ], width=2)
-        ]),
+            ], width=2),
+        ], align='center', justify='center'),
+        html.Br(),
         dbc.Row([
             dbc.Col(
                 dcc.Graph(id='line-1', figure={})
@@ -122,13 +139,6 @@ layout=html.Div(children=[
                 ])
             ])
         ),
-        dbc.Row([
-            dbc.Col([
-                html.Div([
-                    html.H6(['Source: The Book of Answers of Life'])
-                ])
-            ])
-        ])
     ]),
     html.Br(),
     dbc.Container([
@@ -139,6 +149,25 @@ layout=html.Div(children=[
                 ])
             ])
         ])
+    ]),
+    dbc.Container([
+        html.Br(),
+        dbc.Row([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Units: Millions of Dollars (M)', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Last Update: 2020', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4)
+                ])
+            ], style={"border":"2px black solid"})
+        ], align='center', justify='center'),
+        html.Br(),
     ]),
     dbc.Container([
         dbc.Row([
@@ -205,13 +234,6 @@ layout=html.Div(children=[
                 ])
             ])
         ]),
-        dbc.Row([
-            dbc.Col([
-                html.Div([
-                    html.H6(['Source: The Book of Answers of Life'])
-                ])
-            ])
-        ])
     ])
 ])
 @app.callback(

@@ -10,14 +10,20 @@ import pathlib
 from app import app
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from apps.dataset import *
+from apps.dataBag import *
 
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
 DATA_PATH = PATH.joinpath("../datasets/Income").resolve() #Once we're on that path, we go into datasets. 
 df_income= pd.read_excel(DATA_PATH.joinpath("Household_Family Income by Zip Code.xlsx"))
+df_median=pd.read_excel(DATA_PATH.joinpath("Median Household income.xlsx"))
 df_income_copy=df_income.copy()
+#incomeDataset=dataset('Median Household & Personal Income Chart', df_median, 'Income', 'income', 'Indicator', 'Income')
+#incomeDataset.modify_percent_change(['County', 'Household Type', 'Industry', 'Indicator'], 'County', 'Income')
 df_income_zip=df_income_copy[~df_income_copy['ZIP'].isin(['Texas', 'El Paso County, Texas'])]
 df_overall=df_income[df_income['ZIP'].isin(['Texas', 'El Paso County, Texas'])]
 df_revenues=pd.read_excel(DATA_PATH.joinpath('Revenues by Workers Remittances, Distribution by municipality, Chihuahua, Juárez.xlsx'))
+revenuesDataset=dataset('Revenues by Workers Remittances Chart', df_revenues, 'Dollars in Millions', name='revenues')
 maxYear=df_income['Year'].max()
 
 df_median=pd.read_excel(DATA_PATH.joinpath("Median Household income.xlsx"))

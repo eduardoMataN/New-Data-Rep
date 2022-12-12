@@ -20,11 +20,14 @@ df_cit=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Citizenship.xlsx'))
 df_cit_per=df_cit.copy()
 df_cit_per['Apprehensions']=df_cit_per['Apprehensions'].pct_change()
 citDataset=dataset('Yearly Apprehensions by Citizenship Chart', df_cit, 'Apprehensions','tab-cit', 'Citizenship', 'Apprehensions')
+citDataset.modify_percent_change('Sector', 'Citizenship', 'Apprehensions')
 
 df_country=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Country.xlsx'))
 df_country_per=df_country.copy()
 df_country_per['Illegal Alien Apprehensions']=df_country_per['Illegal Alien Apprehensions'].pct_change()
 countryDataset=dataset('Yearly Apprehensions by Country Chart', df_country, 'Illegal Alien Apprehensions', 'tab-country', 'Country', 'Illegal Alien Apprehensions')
+countryDataset.modify_percent_change('Sector', 'Country', 'Illegal Alien Apprehensions')
+
 
 
 df_uac=pd.read_excel(DATA_PATH.joinpath('Monthly UAC Apprehensions by Sector.xlsx'))
@@ -119,6 +122,25 @@ layout=html.Div([
     html.Br(),
     dbc.Container([
         dbc.Row([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Units: Individuals', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Last Update: 2019', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4)
+                ])
+            ], style={"border":"2px black solid"})
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
+    dbc.Container([
+        dbc.Row([
             dbc.Col([
                 html.Div([
                     html.Label(id='sector-label', children=['Sector'], style=LABEL),
@@ -169,6 +191,25 @@ layout=html.Div([
         ])
     ]),
     html.Br(),
+    html.Br(),
+    dbc.Container([
+        dbc.Row([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Units: Individuals', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Last Update: September 2019', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4)
+                ])
+            ], style={"border":"2px black solid"})
+        ], align='center', justify='center'),
+        html.Br(),
+    ]),
     dbc.Container([
         dbc.Row([
             dbc.Col([
@@ -222,6 +263,25 @@ layout=html.Div([
     html.Br(),
     dbc.Container([
         dbc.Row([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Units: Individuals', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Last Update: 2018', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4)
+                ])
+            ], style={"border":"2px black solid"})
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
+    dbc.Container([
+        dbc.Row([
             dbc.Col([
                 html.Div([
                     html.Label(['Sector'], style=LABEL),
@@ -266,26 +326,20 @@ layout=html.Div([
     Input('monthly-tabs', 'value'),
     Input('sidebar-space','hidden'),
     Input('edit-southwest','n_clicks'),
-    Input('south-tabs','value')]
+    Input('south-tabs','value'),
+    Input('sidebar-title', 'children'),
+    Input('chart-options','value')]
 )
-def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, sideBarShow, southButton, southTabs):
-    trigger_id=ctx.triggered_id
-    sidebar=html.Div()
-    
-    title=''
-    
-        
+def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, sideBarShow, southButton, southTabs, title, chartType):
+    trigger_id=ctx.triggered_id    
     if(trigger_id=='edit-yearly'):
         if(sideBarShow):
             sideBarShow=False
         else:
             sideBarShow=True
         
-        if(currentTabApp=='tab-cit'):
-            title=borderSecurityBag.getTitle(citDataset)
-            
-        else:
-            title=borderSecurityBag.getTitle(countryDataset)
+        title=borderSecurityBag.getByName(currentTabApp).title
+        
             
     if(trigger_id=='edit-monthly'):
         if(sideBarShow):
@@ -293,37 +347,29 @@ def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, 
         else:
             sideBarShow=True
         
-        if(monthlyTab=='family-unit'):
-            title=borderSecurityBag.getTitle(familyDataset)  
-        else:
-            title=borderSecurityBag.getTitle(aucDataset)
+        title=borderSecurityBag.getByName(monthlyTab).title
+        
     if(trigger_id=='edit-southwest'):
         if(sideBarShow):
             sideBarShow=False
         else:
             sideBarShow=True
+        title=borderSecurityBag.getByName(southTabs).title
+    if(trigger_id=='app-tabs'):
+        title=borderSecurityBag.getByName(currentTabApp).title
+    if(trigger_id=='monthly-tabs'):
+        title=borderSecurityBag.getByName(monthlyTab).title
+    if(trigger_id=='south-tabs'):
+        title=borderSecurityBag.getByName(southTabs).title
+    borderSecurityBag.getDataframe(title).activateDataframe(chartType)
         
-        if(southTabs=='apps'):
-            title=borderSecurityBag.getTitle(southwestAppDataset)    
-        else:
-            title=borderSecurityBag.getTitle(southwestDeathDataset)
     
     
 
          
     return sideBarShow, title, title
 
-@app.callback(
-    Output('dummy','children'),
-    [Input('chart-options', 'value'),
-    Input('dummy1', 'children')]
-)
-def update_chart(pathname, title):
-    
-    borderSecurityBag.getDataframe(title).activateDataframe(pathname)
-    
-    
-    return None
+
 
 @app.callback(
     [Output('apprehensions-graph', 'figure'),
@@ -367,6 +413,10 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
             sectorValue=dff['Sector'].unique()[0]
         fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Illegal Alien Apprehensions', color='Country', color_discrete_sequence=get_colors(dff['Country'].unique()))
         fig.update_xaxes(rangeslider_visible=True)   
+    if(borderSecurityBag.getByName(currentTab).get_active_mode()=='Original'):
+        nothing='nothing'
+    else:
+        fig.update_yaxes(ticksuffix='%')
         #fig.update_layout(xaxis=dict(range=[x[0],x[-1]],rangeslider=dict(range=[x[0],x[-1]])))
     
     #Chunk for section 2:
@@ -384,6 +434,10 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
             monthlyValue=dff2['Sector'].unique()[0]
         fig2=px.line(filter_df(dff2, 'Sector', monthlyValue), x='Date', y='Unaccompanied Alien Children Apprehended')
         fig2.update_traces(line_color='#FF8200')
+    if(borderSecurityBag.getByName(monthlyTab).get_active_mode()=='Original'):
+        nothing='nothing'
+    else:
+        fig2.update_yaxes(ticksuffix='%')
     fig2.update_xaxes(rangeslider_visible=True)
     
     #Chunk for section 3:
@@ -402,5 +456,9 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
         fig3=px.line(filter_df(dff3, 'Sector', southValue), x='Year', y='Deaths')
         fig3.update_traces(line_color='#FF8200')
     fig3.update_xaxes(rangeslider_visible=True)
+    if(borderSecurityBag.getByName(southTab).get_active_mode()=='Original'):
+        nothing='nothing'
+    else:
+        fig3.update_yaxes(ticksuffix='%')
     
     return fig, sectorOptions, sectorValue, monthlyOptions, monthlyValue, fig2, southOptions, southValue, fig3

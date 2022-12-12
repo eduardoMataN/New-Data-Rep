@@ -65,11 +65,34 @@ layout=html.Div([
             ])
         ]),
         html.Br(),
-        dbc.Col([
+        
+    ]),
+    html.Br(),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Last Update: 2019', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4)
+                ], align='center', justify='center')
+            ], style={"border":"2px black solid"})
+            ]),
+            dbc.Col([
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-staff', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
             ], width=2)
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
     ]),
     dbc.Container([
         dbc.Row([
@@ -117,4 +140,6 @@ def update_data(indicator, dummyValue):
     if(indicator=='sector'):
         fig=px.line(dff, x='Year', y='Staff', color='Sector', color_discrete_sequence=get_colors(dff['Sector'].unique()))
     fig.update_xaxes(rangeslider_visible=True)
+    if(dummyValue=='PercentChange'):
+        fig.update_yaxes(ticksuffix='%')
     return fig

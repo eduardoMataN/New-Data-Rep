@@ -57,6 +57,27 @@ layout=html.Div(children=[
                 ])
             ])
         ]),
+        dbc.Container([
+        dbc.Row([
+            dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        html.P(' Units: Crimes', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Last Update: 2019', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4)
+                ], align='center', justify='center')
+            ], style={"border":"2px black solid"})
+            ]),
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
         dbc.Row([
             dbc.Col([
                 html.Div([

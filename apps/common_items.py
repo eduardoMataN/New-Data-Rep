@@ -95,14 +95,26 @@ CONTENT_STYLE = {
 }
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
  #Once we're on that path, we go into datasets. 
+def get_colors(legend):
+    final_color_list=[]
+    for i in range(0, len(legend)):
+        if(i>len(legend_colors)-1):
+            r = lambda: random.randint(0,255)
+            final_color_list.append('#%02X%02X%02X' % (r(),r(),r()))
+        else:
+            final_color_list.append(legend_colors[i])
+    return final_color_list
 def create_subplot(fig,row, col, df, xaxes, yaxes, names):
     df_sub=df.copy()
     legend=df_sub[names].unique()
-    for name in legend:
+    colors=get_colors(legend)
+    for index, name in enumerate(legend):
         df_ind=df_sub[df_sub[names]==name]
         x=df_ind[xaxes]
         y=df_ind[yaxes]
-        fig.add_trace(go.Scatter(x=x, y=y, name=name), row=row, col=col)
+        fig.add_trace(go.Scatter(x=x, y=y, name=name, marker=dict(color=colors[index])), row=row, col=col)
+    
+    
         
     return fig
 def get_options(df, col):
@@ -123,15 +135,7 @@ def sum_df(df, sumCol, sumBy, target):
    
     return pd.DataFrame.from_dict(newDf)
 
-def get_colors(legend):
-    final_color_list=[]
-    for i in range(0, len(legend)):
-        if(i>len(legend_colors)-1):
-            r = lambda: random.randint(0,255)
-            final_color_list.append('#%02X%02X%02X' % (r(),r(),r()))
-        else:
-            final_color_list.append(legend_colors[i])
-    return final_color_list
+
 def generate_sidebar(title, buttons):
     sidebar=html.Div(
     [

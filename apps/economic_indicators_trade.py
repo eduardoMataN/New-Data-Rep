@@ -78,10 +78,27 @@ layout=html.Div(children=[
         dbc.Row([
             dbc.Col([
                 html.Div([
-                    html.H2(['Imports & Exports by HS Commodities'], style=TITLE)
+                    html.H2(['Imports & Exports by HS/NAICS Commodities'], style=TITLE)
                 ])
             ])
         ]),
+        html.Br(),
+        dbc.Row([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Units: Millions of Dollars (M)', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Last Update: 2022', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=4)
+                ])
+            ], style={"border":"2px black solid"})
+        ], align='center', justify='center'),
+        html.Br(),
         dbc.Row([
             dbc.Col([
                 html.Div([
@@ -195,6 +212,26 @@ layout=html.Div(children=[
             ])
         ])
     ]),
+    dbc.Container(children=[
+        dbc.Row([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Units: Thousands of Dollars (K)', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col(
+                        html.P('Last Update: 2020', style={'color':blue, 'font-weight':'bold'}),
+                        width=3
+                    ),
+                    dbc.Col(
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'}),
+                        width=3
+                    )
+                ])
+            ], style={"border":"2px black solid"})
+        ]),
+    ]),
+    html.Br(),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([
