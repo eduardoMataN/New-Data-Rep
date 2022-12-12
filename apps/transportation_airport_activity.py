@@ -12,6 +12,8 @@ from app import app
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from apps.common_items import *
+from apps.dataset import *
+from apps.dataBag import *
 
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
@@ -19,6 +21,7 @@ df_domes_int=pd.read_excel(DATA_PATH.joinpath('Jurez & Chihuahua.xlsx'))
 df_ep=pd.read_excel(DATA_PATH.joinpath('El Paso Passengers 2012-2022.xlsx'))
 
 layout=html.Div(children=[
+    
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([

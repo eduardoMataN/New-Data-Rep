@@ -12,14 +12,43 @@ from app import app
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from apps.common_items import *
+from apps.dataset import *
+from apps.dataBag import *
 
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
 df_crime=pd.read_excel(DATA_PATH.joinpath('Crime 2006 - 2019.xlsx'))
-
+crimeDataset=dataset('Crime by County Chart', df_crime, 'Number', 'crime', 'County', 'Number')
+crimeDataset.modify_percent_change('Crime Desctiption', 'County', 'Number')
+crimeDatabag=dataBag([crimeDataset])
 
 
 layout=html.Div(children=[
+    html.Div(id='sidebar-space-crime',children=[
+        html.Div(
+    [
+        html.H6(id='sidebar-title-crime',children='Crime By County'),
+        html.Hr(),
+        html.P(
+            "Use the following buttons to edit the chart.", className="lead"
+        ),
+        dbc.RadioItems(
+            id='chart-options-crime',
+            options=[
+                {'label':'Percent Change','value':'PercentChange'},
+                {'label': 'Original Chart','value':'Original'}
+            ],
+            value='Original',
+            
+        ),
+        
+
+
+        
+    ],
+    style=SIDEBAR_STYLE,
+    )
+    ], hidden=True),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([
@@ -78,7 +107,13 @@ layout=html.Div(children=[
                         disabled=True
                     )
                 ])
-            ])
+            ]),
+            dbc.Col([
+                html.Div([
+                    
+                    dbc.Button('Edit Graph', id='edit-crime', outline=True, color="primary", className="me-1", value='edit')
+                ])
+            ], width=2)
         ]),
         dbc.Row([
             dbc.Col(
@@ -94,6 +129,23 @@ layout=html.Div(children=[
 ])
 
 @app.callback(
+    
+    Output('sidebar-space-crime', 'hidden'),
+    [Input('edit-crime', 'n_clicks'),
+    Input('sidebar-space-crime', 'hidden'),
+    Input('chart-options-crime', 'value')]
+)
+def get_sidebar(button, showSideBar, chartMode):
+    trigger_id=ctx.triggered_id
+    if(trigger_id=='edit-crime'):
+        if(showSideBar):
+            showSideBar=False
+        else:
+            showSideBar=True
+    crimeDatabag.getDataframe().activateDataframe(chartMode)
+    return showSideBar
+
+@app.callback(
     [
         Output('cr-graph', 'figure'),
         Output('select-county1-cr','disabled'),
@@ -103,11 +155,12 @@ layout=html.Div(children=[
         Input('select-type-cr','value'),
         Input('select-county1-cr','value'),
         Input('select-county2-cr', 'value'),
-        Input('sbs-cr', 'on')
+        Input('sbs-cr', 'on'),
+        Input('chart-options-crime', 'value')
     ] 
 )
-def update_data(type, county1, county2, on):
-    dff=df_crime.copy()
+def update_data(type, county1, county2, on, dummyValue):
+    dff=crimeDatabag.getDataframe().getActive().copy()
     dff=dff[dff['Crime Desctiption']==type]
     d1_dis=True
     d2_dis=True

@@ -12,11 +12,43 @@ from app import app
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from apps.common_items import *
+from apps.dataset import *
+from apps.dataBag import *
 DATA_PATH = PATH.joinpath("../datasets/Migration Indicators").resolve()
 
 df_migration=pd.read_excel(DATA_PATH.joinpath('County to County Migration Flows 2009-2018.xlsx'))
+migrationDataset=dataset('Migration Indicators by State Chart', df_migration, 'Value', 'migrationState', 'Migration', 'Value')
+migrationDataset.modify_percent_change('State', 'Migration', 'Value')
+migrationDatasetCounty=dataset('Migration Indicators by County Chart', df_migration, 'Value', 'migrationCounty', 'Migration', 'Value')
+migrationDatasetCounty.modify_percent_change('County', 'Migration', 'Value')
+migrationDatabag=dataBag([migrationDataset, migrationDatasetCounty])
 
 layout=html.Div([
+    html.Div(id='sidebar-space-migration',children=[
+        html.Div(
+    [
+        html.H6(id='sidebar-title-migration',children='Border Patrol Agent Staffing'),
+        html.Hr(),
+        html.P(
+            "Use the following buttons to edit the chart.", className="lead"
+        ),
+        dbc.RadioItems(
+            id='chart-options-migration',
+            options=[
+                {'label':'Percent Change','value':'PercentChange'},
+                {'label': 'Original Chart','value':'Original'}
+            ],
+            value='Original',
+            
+        ),
+        
+
+
+        
+    ],
+    style=SIDEBAR_STYLE,
+    )
+    ], hidden=True),
     dbc.Container([
         dbc.Row([
             dbc.Col([
@@ -51,6 +83,11 @@ layout=html.Div([
                         color=orange
                     )
                 ])
+            ], width=2),
+            dbc.Col([
+                html.Div([
+                    dbc.Button('Edit Graph', id='edit-migration', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                ])
             ], width=2)
         ])
     ]),
@@ -69,16 +106,45 @@ layout=html.Div([
 ])
 
 @app.callback(
+    [Output('sidebar-space-migration','hidden'),
+    Output('sidebar-title-migration', 'children')],
+    [Input('edit-migration', 'n_clicks'),
+    Input('state-county','on'),
+    Input('sidebar-space-migration', 'hidden'),
+    Input('chart-options-migration', 'value')]
+)
+def get_sidebar(button, filter, hideSideBar, graphMode):
+    trigger_id=ctx.triggered_id
+    if(trigger_id=='edit-migration'):
+        if(hideSideBar):
+            hideSideBar=False
+        else:
+            hideSideBar=True
+    if(filter):
+        title=migrationDatabag.getByName('migrationCounty').title
+        migrationDatabag.getByName('migrationCounty').activateDataframe(graphMode)
+    else:
+        title=migrationDatabag.getByName('migrationState').title
+        migrationDatabag.getByName('migrationState').activateDataframe(graphMode)
+
+    
+    return hideSideBar, title
+
+@app.callback(
     Output('migration-graph','figure'),
     [Input('select-flow','value'),
-    Input('state-county','on')]
+    Input('state-county','on'),
+    Input('chart-options-migration','value')]
 )
-def update_data(migrationFlow, view):
-    dff=df_migration.copy()
-    dff=filter_df(dff, 'Migration', migrationFlow)
+def update_data(migrationFlow, view, dummyValue):
+    
     if(view):
+        dff=migrationDatabag.getByName('migrationCounty').getActive().copy()
+        dff=filter_df(dff, 'Migration', migrationFlow)
         fig=px.line(dff, x='Year', y='Value', color='County')
     else:
+        dff=migrationDatabag.getByName('migrationState').getActive().copy()
+        dff=filter_df(dff, 'Migration', migrationFlow)
         fig=px.line(sum_df(dff, 'State', 'Year', 'Value'), x='Year', y='Value', color='State')
     fig.update_xaxes(rangeslider_visible=True)
     return fig

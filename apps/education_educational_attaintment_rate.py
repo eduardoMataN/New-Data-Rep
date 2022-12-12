@@ -19,6 +19,7 @@ PATH = pathlib.Path(__file__).parent #So this first line is going to the parent 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
 df_edu=pd.read_excel(DATA_PATH.joinpath('Educational Attainment and Rate.xlsx'))
 educDataset=dataset('Educational Attainment Rate by County', df_edu, 'Value', 'line-edu', 'County','Value')
+educDataset.modify_percent_change(['County', 'Age'], 'Educational Attainment', 'Value')
 educDatabag=dataBag([educDataset])
 
 layout=html.Div(children=[

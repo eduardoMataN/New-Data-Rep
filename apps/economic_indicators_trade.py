@@ -12,12 +12,24 @@ from app import app
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from apps.common_items import *
+from apps.dataset import *
+from apps.dataBag import *
+
 
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
 DATA_PATH = PATH.joinpath("../datasets/Trade").resolve() #Once we're on that path, we go into datasets. 
 df_trade_hs= pd.read_excel(DATA_PATH.joinpath("Imports & Exports by HS Commodities, yearly.xlsx"))
+hsImportsDataset=dataset('Imports by HS Commodities Imports Chart', df_trade_hs,'Imports', 'hsImports', 'Port', 'Imports')
+hsImportsDataset.modify_percent_change(['Measures', 'Commodity'], 'Port', 'Imports')
+hsExportsDataset=dataset('Exports by HS Commodities Imports Chart', df_trade_hs,'Exports', 'hsExports', 'Port', 'Exports')
+hsExportsDataset.modify_percent_change(['Measures', 'Commodity'], 'Port', 'Exports')
 df_trade_naics=pd.read_excel(DATA_PATH.joinpath("Exports & Imports by NAICS Commodities, yearly.xlsx"))
+naicsDataset=dataset('Imports & Exports by NAICS Commodities Chart', df_trade_naics, 'Value', 'naics', 'Commodity', 'Value')
+naicsDataset.modify_percent_change(['Commodity', 'Measures'], 'District', 'Value')
 df_ep=pd.read_excel(DATA_PATH.joinpath("Total Flows to El Paso.xlsx"))
+epDataset=dataset('Total Flows to El Paso Chart', df_ep, 'Total', 'totalFlows', 'Commodity', 'Total')
+epDataset.modify_percent_change('Mode', 'Commodity', 'Total')
+tradeDatabag=dataBag([naicsDataset, hsExportsDataset, hsImportsDataset, epDataset])
 
 
 SIDEBAR_STYLE = {
@@ -37,6 +49,31 @@ CONTENT_STYLE = {
 }
 
 layout=html.Div(children=[
+    html.Div(id='sidebar-space-trade',children=[
+        html.Div(
+    [
+        html.H6(id='sidebar-title-trade',children='Imports by HS Commodities Imports Chart'),
+        html.Hr(),
+        html.P(
+            "Use the following buttons to edit the chart.", className="lead"
+        ),
+        dbc.RadioItems(
+            id='chart-options-trade',
+            options=[
+                {'label':'Percent Change','value':'PercentChange'},
+                {'label': 'Original Chart','value':'Original'}
+            ],
+            value='Original',
+            
+        ),
+        
+
+
+        
+    ],
+    style=SIDEBAR_STYLE,
+    )
+    ], hidden=True),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([
@@ -131,7 +168,13 @@ layout=html.Div(children=[
                         optionHeight=90
                     )
                 ])
-            ])
+            ]),
+            dbc.Col([
+                html.Div([
+                    
+                    dbc.Button('Edit Graph', id='edit-trade-impex', outline=True, color="primary", className="me-1", value='edit')
+                ])
+            ], width=2)
         ])
     ]),
     dbc.Container(children=[
@@ -188,6 +231,36 @@ layout=html.Div(children=[
         ])
     ])
 ])
+@app.callback(
+    
+    [Output('sidebar-space-trade', 'hidden'),
+    Output('sidebar-title-trade', 'children')],
+    [Input('edit-trade-impex', 'n_clicks'),
+    Input('sidebar-space-trade', 'hidden'),
+    Input('chart-options-trade', 'value'),
+    Input('toggle-int-2', 'value'),
+    Input('toggle-int','value'),
+    Input('sidebar-title-trade', 'children')]
+)
+def get_sidebar(buttonimpEx, showSideBar, chartMode, hsNaics, impExp, title):
+    trigger_id=ctx.triggered_id
+    name='hsImports'
+    if(buttonimpEx):
+        if(showSideBar):
+            showSideBar=False
+        else:
+            showSideBar=True
+        if(hsNaics):
+            name='naics'
+        else:
+            if(impExp):
+                name='hsExports'
+            else:
+                name='hsImports'
+
+    tradeDatabag.getByName(name).activateDataframe(chartMode)
+    title=tradeDatabag.getByName(name).title
+    return showSideBar, title
 
 @app.callback(
     [
@@ -217,18 +290,21 @@ layout=html.Div(children=[
         Input('select-comm-int', 'options'),
         Input('compare-port1','options'),
         Input('compare-port2','options'),
-        Input('select-mode-int','value')
+        Input('select-mode-int','value'),
+        Input('chart-options-trade', 'value'),
+        Input('sidebar-title-trade', 'children')
     ]
 )
-def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleImEx,toggleHsNaics, portValue1, portValue2, commodityOptions, portOptions1, portOptions2, mode):
+def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleImEx,toggleHsNaics, portValue1, portValue2, commodityOptions, portOptions1, portOptions2, mode, dummyValue, sideBarTitle):
     #Chunk to update Top Part of Page. 
     comparePort1=True
     comparePort2=True
     importsToggle=False
     naicsDropdown=True
     trigger_id=ctx.triggered_id
+    dff=tradeDatabag.getDataframe(sideBarTitle).getActive().copy()
     if(toggleHsNaics==True):
-        dff=df_trade_naics.copy()
+        #dff=df_trade_naics.copy()
         naicsDropdown=False
         importsToggle=True
         if(trigger_id=='toggle-int-2'):
@@ -255,7 +331,7 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
             fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Value', color='District')
             
     else:
-        dff=df_trade_hs.copy()
+        #dff=df_trade_hs.copy()
         if(trigger_id=='toggle-int-2'):
             measureOptions=[{'label':x,'value':x}for x in dff['Measures'].unique()]
             measureValue=dff['Measures'].unique()[0]

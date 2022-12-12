@@ -12,15 +12,28 @@ from app import app
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from apps.common_items import *
+from apps.dataset import *
+from apps.dataBag import *
 
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
 df_age=pd.read_excel(DATA_PATH.joinpath('Poverty by Age.xlsx'))
+ageDataset=dataset('Poverty by Age Chart', df_age, name='tab-age')
+#ageDataset.modify_percent_change('County', 'Age', 'Percentage')
 df_sex=pd.read_excel(DATA_PATH.joinpath('Poverty by Sex.xlsx'))
+sexDataset=dataset('Poverty by Sex Chart', df_sex, name='tab-sex')
+#sexDataset.modify_percent_change('County', 'Sex', 'Percentage')
 df_educ=pd.read_excel(DATA_PATH.joinpath('Poverty by Educational Attainment.xlsx'))
+educDataset=dataset('Povery by Educational Attaintment Chart', df_educ, name='tab-educ')
+#educDataset.modify_percent_change('County', 'Educational Attainment', 'Percentage')
 df_race=pd.read_excel(DATA_PATH.joinpath('Poverty by Race.xlsx'))
+raceDataset=dataset('Poverty by Race Chart', df_race, name='tab-race')
+#raceDataset.modify_percent_change('County', 'Race', 'Percentage')
+povertyDatabag=dataBag([ageDataset, sexDataset, raceDataset, educDataset])
+
 
 layout=html.Div([
+    
     dbc.Container([
     dcc.Tabs(id='poverty-tabs', value='tab-age', children=[
         dcc.Tab(label='By Age', value='tab-age', style=tab_style, selected_style=tab_selected_style),
@@ -78,7 +91,8 @@ layout=html.Div([
                         disabled=False
                     )
                 ])
-            ], width=2)
+            ], width=2),
+            
         ])
     ]),
     dbc.Container([
@@ -97,6 +111,7 @@ layout=html.Div([
 ])
 
 
+
 @app.callback(
     [Output('section-title', 'children'),
     Output('select-county','options'), Output('select-county','value'), Output('select-county','disabled'),
@@ -111,11 +126,11 @@ layout=html.Div([
 )
 def update_content(tab, countyOptions, countyValue, categoryOptions, categoryValue, toggleValue, toggleLabel, categoryLabel):
     trigger_id=ctx.triggered_id
-    
+    dff=povertyDatabag.getByName(tab).getActive().copy()
     disableCounty=False
     disableCategory=False
     if(tab=='tab-age'):
-        dff=df_age.copy()
+        #dff=df_age.copy()
         title=['Poverty By Age']
         if(trigger_id=='poverty-tabs'):
             countyOptions=[{'label':x,'value':x}for x in dff['County'].unique()]
@@ -135,7 +150,7 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             
         
     elif(tab=='tab-race'):
-        dff=df_race.copy()
+        #dff=df_race.copy()
         title=['Poverty By Race']
         if(trigger_id=='poverty-tabs'):
             countyOptions=[{'label':x,'value':x}for x in dff['County'].unique()]
@@ -154,7 +169,7 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             disableCounty=True
         
     elif(tab=='tab-sex'):
-        dff=df_sex.copy()
+        #dff=df_sex.copy()
         title=['Poverty By Sex']
         if(trigger_id=='poverty-tabs'):
             countyOptions=[{'label':x,'value':x}for x in dff['County'].unique()]
@@ -173,7 +188,7 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             disableCounty=True
         
     elif(tab=='tab-educ'):
-        dff=df_educ.copy()
+        #dff=df_educ.copy()
         title=['Poverty By Educational Attainment']
         if(trigger_id=='poverty-tabs'):
             countyOptions=[{'label':x,'value':x}for x in dff['County'].unique()]
@@ -193,7 +208,7 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
         
     else:
         title=['Poverty By Age']
-        dff=df_age.copy()
+        #dff=df_age.copy()
         title=['Poverty By Age']
         if(trigger_id=='poverty-tabs'):
             countyOptions=[{'label':x,'value':x}for x in dff['County'].unique()]
