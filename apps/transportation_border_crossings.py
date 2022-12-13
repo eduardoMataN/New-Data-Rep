@@ -72,6 +72,12 @@ layout=html.Div(children=[
     dbc.Container([
         html.Br(),
         dbc.Row([
+            dbc.Col(
+                html.Div([
+                    html.H1(id='section-title', children=['Border Crossings'], style={'color':'#041E42'})
+                ]),
+                width=2
+            ),
             dbc.Col([
                 html.Div([
                     dbc.Button(
@@ -91,12 +97,6 @@ layout=html.Div(children=[
                 ])
             ], width=1),
             dbc.Col(
-                width=3
-            ),
-            dbc.Col(
-                html.Div([
-                    html.H1(id='section-title', children=['Border Security'], style={'color':'#041E42'})
-                ]),
                 width=4
             ),
             
@@ -189,7 +189,7 @@ layout=html.Div(children=[
                 html.Div([
                     html.H1(id='profiler-title',children=[('Port Analyzer')], style={'color':'#041E42'}),
                 ])
-            ], width=3),
+            ], width=1),
             dbc.Col([
                 html.Div([
                     dbc.Button(
@@ -207,8 +207,33 @@ layout=html.Div(children=[
                         trigger='click'
                     )
                 ])
-            ])
+            ], width=1)
         ]),
+        html.Br(),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        
+                    ], width=2),
+                    dbc.Col([
+                        html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Last Update: June 2022', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3)
+                ], align='center', justify='center')
+            ], style={"border":"2px black solid"})
+            ]),
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
         dbc.Row([
             dbc.Col([
                 html.Div([
