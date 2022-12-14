@@ -347,28 +347,33 @@ layout=html.Div([
 def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, sideBarShow, southButton, southTabs, title, chartType):
     trigger_id=ctx.triggered_id    
     if(trigger_id=='edit-yearly'):
+        newTitle=borderSecurityBag.getByName(currentTabApp).title
         if(sideBarShow):
             sideBarShow=False
         else:
             sideBarShow=True
-        
-        title=borderSecurityBag.getByName(currentTabApp).title
+        if(title!=newTitle):
+            sideBarShow=False
+        title=newTitle
         
             
     if(trigger_id=='edit-monthly'):
+        newTitle=borderSecurityBag.getByName(monthlyTab).title
         if(sideBarShow):
             sideBarShow=False
-        else:
+        elif(title==newTitle):
             sideBarShow=True
         
-        title=borderSecurityBag.getByName(monthlyTab).title
+        title=newTitle
         
     if(trigger_id=='edit-southwest'):
+        newTitle=borderSecurityBag.getByName(southTabs).title
         if(sideBarShow):
             sideBarShow=False
-        else:
+        elif(title==newTitle):
             sideBarShow=True
-        title=borderSecurityBag.getByName(southTabs).title
+        title=newTitle
+        
     if(trigger_id=='app-tabs'):
         title=borderSecurityBag.getByName(currentTabApp).title
     if(trigger_id=='monthly-tabs'):

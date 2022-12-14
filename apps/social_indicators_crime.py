@@ -48,7 +48,7 @@ layout=html.Div(children=[
     ],
     style=SIDEBAR_STYLE,
     )
-    ], hidden=True),
+    ], hidden=True, style={'zIndex':'999'}),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([
@@ -200,6 +200,6 @@ def update_data(type, county1, county2, on, dummyValue):
         d1_dis=False
         d2_dis=False
     else:
-        fig=px.line(dff,'Year','Number', color='County')
+        fig=px.line(dff,'Year','Number', color='County', color_discrete_sequence=get_colors(dff['County'].unique()))
         fig.update_xaxes(rangeslider_visible=True)
     return fig, d1_dis, d2_dis

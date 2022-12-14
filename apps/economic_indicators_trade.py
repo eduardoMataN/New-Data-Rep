@@ -376,7 +376,7 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
             fig.update_xaxes(rangeslider= {'visible':True}, row=1, col=2)
             
         else:
-            fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Value', color='District')
+            fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Value', color='District', color_discrete_sequence=get_colors(dff['District'].unique()))
             
     else:
         #dff=df_trade_hs.copy()
@@ -405,14 +405,14 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
                 fig.update_xaxes(rangeslider= {'visible':True}, row=1, col=2)
         else:
             if(toggleImEx):
-                fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Exports', color='Port')
+                fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Exports', color='Port', color_discrete_sequence=get_colors(dff['Port'].unique()))
                 fig.update_xaxes(rangeslider_visible=True)
             else:
-                fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Imports', color='Port')
+                fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Imports', color='Port', color_discrete_sequence=get_colors(dff['Port'].unique()))
                 fig.update_xaxes(rangeslider_visible=True)
     #Chunk to Update Second Section:
     dff_ep=df_ep.copy()
-    fig2=px.line(dff_ep[dff_ep['Mode']==mode], x='Year', y="Total", color='Commodity')
+    fig2=px.line(dff_ep[dff_ep['Mode']==mode], x='Year', y="Total", color='Commodity', color_discrete_sequence=get_colors(dff['Commodity'].unique()))
     total_f=round(sum(dff_ep[dff_ep['Mode']==mode]['Total']),1)
     fig2.update_xaxes(tick0=1, dtick=1)
     fig2.update_xaxes(rangeslider_visible=True)

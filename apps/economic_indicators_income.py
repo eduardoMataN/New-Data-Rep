@@ -318,6 +318,7 @@ layout=html.Div(children=[
     
     
     
+    
 ]
 
 )
@@ -362,11 +363,7 @@ def update_median(ind, household, industry, chartType):
         drop1=True
         df_temp=dff[dff['Indicator']==ind]
         counties=df_temp['County'].unique()
-        for county in counties:
-            df_ind=df_temp[df_temp['County']==county]
-            x=df_ind['Year']
-            y=df_ind['Income']
-            fig.add_trace(go.Scatter(x=x, y=y, name=county), row=1, col=1)
+        fig=create_subplot(fig, 1, 1, df_temp, 'Year', 'Income', 'County')
         fig.update_xaxes(rangeslider_visible=True)
         if(chartType=='PercentChange'):
             fig.update_yaxes(ticksuffix='%')
@@ -375,11 +372,7 @@ def update_median(ind, household, industry, chartType):
         drop1=False
         df_temp=dff[dff['Indicator']==ind]
         counties=df_temp['County'].unique()
-        for county in counties:
-            df_ind=df_temp[(df_temp['County']==county) &(df_temp['Household Type']==household)]
-            x=df_ind['Year']
-            y=df_ind['Income']
-            fig.add_trace(go.Scatter(x=x, y=y, name=county), row=1, col=1)
+        fig=create_subplot(fig, 1, 1, df_temp[df_temp['Household Type']==household], 'Year', 'Income', 'County')
         fig.update_xaxes(rangeslider_visible=True)
         if(chartType=='PercentChange'):
             fig.update_yaxes(ticksuffix='%')
@@ -387,15 +380,14 @@ def update_median(ind, household, industry, chartType):
     if (ind=='Earnings by Industry'):
         drop3=False
         df_temp=dff[dff['Indicator']==ind]
-        #df_temp=dff[dff['Industry']==industry]
+        df_temp=dff[dff['Industry']==industry]
         counties=df_temp['County'].unique()
-        for county in counties:
-            df_ind=df_temp[(df_temp['County']==county) & (df_temp['Industry']==industry)]
-            x=df_ind['Year']
-            y=df_ind['Income'].dropna()
-            fig.add_trace(go.Scatter(x=x, y=y, name=county), row=1, col=1)
+        fig=create_subplot(fig, 1, 1, df_temp[df_temp['Industry']==industry], 'Year', 'Income', 'County')
         fig.update_xaxes(rangeslider_visible=True)
-        fig.update_yaxes(ticksuffix='M')
+        if(chartType=='PercentChange'):
+            fig.update_yaxes(ticksuffix='%')
+        else:
+            fig.update_yaxes(ticksuffix='M')
     dff_revenues=incomeDatabag.getByName('revenues').getActive().copy()
     fig3=px.line(dff_revenues, x='Date', y='Dollars in Millions')
     fig3.update_layout(yaxis_tickprefix='$')

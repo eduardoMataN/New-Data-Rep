@@ -165,11 +165,11 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             toggleLabel='By County/By Age'
         if(toggleValue):
             dff=dff[dff['County']==countyValue]
-            fig=px.line(dff, x='Year',y='Percentage', color='Age')
+            fig=px.line(dff, x='Year',y='Percentage', color='Age', color_discrete_sequence=get_colors(dff['Age'].unique()))
             disableCategory=True
         else:
             dff=dff[dff['Age']==categoryValue]
-            fig=px.line(dff,x='Year',y='Percentage',color='County')
+            fig=px.line(dff,x='Year',y='Percentage',color='County', color_discrete_sequence=get_colors(dff['County'].unique()))
             disableCounty=True
             
         
@@ -185,11 +185,11 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             toggleLabel='By County/By Race'
         if(toggleValue):
             dff=dff[dff['County']==countyValue]
-            fig=px.line(dff, x='Year',y='Percentage', color='Race')
+            fig=px.line(dff, x='Year',y='Percentage', color='Race', color_discrete_sequence=get_colors(dff['Race'].unique()))
             disableCategory=True
         else:
             dff=dff[dff['Race']==categoryValue]
-            fig=px.line(dff,x='Year',y='Percentage',color='County')
+            fig=px.line(dff,x='Year',y='Percentage',color='County', color_discrete_sequence=get_colors(dff['County'].unique()))
             disableCounty=True
         
     elif(tab=='tab-sex'):
@@ -204,11 +204,11 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             toggleLabel='By County/By Sex'
         if(toggleValue):
             dff=dff[dff['County']==countyValue]
-            fig=px.line(dff, x='Year',y='Percentage', color='Sex')
+            fig=px.line(dff, x='Year',y='Percentage', color='Sex', color_discrete_sequence=get_colors(dff['Sex'].unique()))
             disableCategory=True
         else:
             dff=dff[dff['Sex']==categoryValue]
-            fig=px.line(dff,x='Year',y='Percentage',color='County')
+            fig=px.line(dff,x='Year',y='Percentage',color='County', color_discrete_sequence=get_colors(dff['County'].unique()))
             disableCounty=True
         
     elif(tab=='tab-educ'):
@@ -223,11 +223,11 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             toggleLabel='By County/By Educational Attainment'
         if(toggleValue):
             dff=dff[dff['County']==countyValue]
-            fig=px.line(dff, x='Year',y='Percentage', color='Educational Attainment')
+            fig=px.line(dff, x='Year',y='Percentage', color='Educational Attainment', color_discrete_sequence=get_colors(dff['Educational Attainment'].unique()))
             disableCategory=True
         else:
             dff=dff[dff['Educational Attainment']==categoryValue]
-            fig=px.line(dff,x='Year',y='Percentage',color='County')
+            fig=px.line(dff,x='Year',y='Percentage',color='County', color_discrete_sequence=get_colors(dff['County'].unique()))
             disableCounty=True
         
     else:
@@ -243,11 +243,11 @@ def update_content(tab, countyOptions, countyValue, categoryOptions, categoryVal
             toggleLabel='By County/By Age'
         if(toggleValue):
             dff=dff[dff['Age']==categoryValue]
-            fig=px.line(dff,x='Year',y='Percentage',color='County')
+            fig=px.line(dff,x='Year',y='Percentage',color='County', color_discrete_sequence=get_colors(dff['County'].unique()))
             disableCounty=True
         else:
             dff=dff[dff['County']==countyValue]
-            fig=px.line(dff, x='Year',y='Percentage', color='Age')
+            fig=px.line(dff, x='Year',y='Percentage', color='Age', color_discrete_sequence=get_colors(dff['Age'].unique()))
             disableCategory=True
     fig.update_xaxes(rangeslider_visible=True)
     

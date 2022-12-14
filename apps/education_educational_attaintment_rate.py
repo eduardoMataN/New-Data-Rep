@@ -26,7 +26,7 @@ layout=html.Div(children=[
     html.Div(id='sidebar-space-educ',children=[
         html.Div(
     [
-        html.H6(id='sidebar-title-educ',children='Border Crossings Chart'),
+        html.H6(id='sidebar-title-educ',children='Educational Attainment Chart'),
         html.Hr(),
         html.P(
             "Use the following buttons to edit the chart.", className="lead"
@@ -113,7 +113,7 @@ layout=html.Div(children=[
                         columns=[{'name':i, 'id':i} for i in df_edu[(df_edu['County']==df_edu['County'].unique()[0]) &(df_edu['Age']==df_edu['Age'].unique()[0])&(df_edu['Year']==df_edu['Year'].unique()[0])][['Educational Attainment', 'Percentage']].columns],
                         data=df_edu[(df_edu['County']==df_edu['County'].unique()[0]) &(df_edu['Age']==df_edu['Age'].unique()[0])&(df_edu['Year']==df_edu['Year'].unique()[0])][['Educational Attainment', 'Percentage']].to_dict('records'),
                         editable=True,
-                        filter_action='native',
+                        
                         sort_action='native',
                         sort_mode='multi',
                         row_selectable=False,
@@ -127,6 +127,7 @@ layout=html.Div(children=[
                 ])
             ])
         ]),
+        html.Br(),
         dbc.Container([
         dbc.Row([
             dbc.Col([
@@ -183,8 +184,10 @@ def get_sidebar(button, showSideBar, chartMode):
 )
 def update_data(county, age,year, dummyValue):
     dff=educDatabag.getDataframe().getActive().copy()
-    fig=px.line(dff[(dff['County']==county)&(dff['Age']==age)], x='Year', y='Value', color='Educational Attainment')
+    fig=px.line(dff[(dff['County']==county)&(dff['Age']==age)], x='Year', y='Value', color='Educational Attainment', color_discrete_sequence=get_colors(dff['Educational Attainment'].unique()))
     fig.update_xaxes( rangeslider_visible=True)
+    if(dummyValue=='PercentChange'):
+        fig.update_yaxes(ticksuffix='%')
     toTable=df_edu[(df_edu['County']==county) &(df_edu['Age']==age)&(df_edu['Year']==year)][['Educational Attainment', 'Percentage']]
     columns=[{'name':i, 'id':i} for i in toTable.columns]
     data=toTable.to_dict('records')

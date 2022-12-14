@@ -21,7 +21,7 @@ df_domes_int=pd.read_excel(DATA_PATH.joinpath('Jurez & Chihuahua.xlsx'))
 df_ep=pd.read_excel(DATA_PATH.joinpath('El Paso Passengers 2012-2022.xlsx'))
 
 layout=html.Div(children=[
-    
+    html.Div([
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([
@@ -120,7 +120,7 @@ layout=html.Div(children=[
         ], align='center', justify='center'),
         html.Br(),
     html.Br(),
-    ]),
+    ])]),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([
@@ -197,7 +197,7 @@ layout=html.Div(children=[
 def update_data(yearEP, municipality, type, year, on):
     dff=df_ep.copy()
     dff=dff[dff['Year']==yearEP]
-    fig=px.bar(dff, 'Month', 'Value', color='Type')
+    fig=px.bar(dff, 'Month', 'Value', color='Type', color_discrete_sequence=get_colors(dff['Type'].unique()))
     munDis=False
     dff2=df_domes_int.copy()
     if(on==True):
@@ -209,5 +209,5 @@ def update_data(yearEP, municipality, type, year, on):
         munDis=True
     else:
         dff2=dff2[(dff2['Municipality']==municipality)&(dff2['Year']==year)&(dff2['Type']==type)]
-        fig2=px.bar(dff2, 'Month', 'Value', hover_data=['Value'], color='Value')
+        fig2=px.bar(dff2, 'Month', 'Value', hover_data=['Value'], color='Value', color_continuous_scale=['#041E42', '#FF8200', '#fff100'])
     return fig, fig2, munDis

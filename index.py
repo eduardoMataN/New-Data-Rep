@@ -91,7 +91,8 @@ app.layout=html.Div(children=[dcc.Location(id='url', refresh=False),
         style={'font-weight':'bold'},
         className='navbar-dark'
         ),
-        html.Div(id='page-content', children=[])
+        html.Div(id='page-content', children=[]),
+        
 ])
 
 @app.callback(Output(component_id='page-content', component_property='children'), 

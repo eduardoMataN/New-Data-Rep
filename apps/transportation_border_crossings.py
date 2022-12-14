@@ -79,24 +79,6 @@ layout=html.Div(children=[
                 ]),
                 width=3
             ),
-            dbc.Col([
-                html.Div([
-                    dbc.Button(
-                        "?",
-                        id="click-target-1",
-                        className="me-1",
-                        n_clicks=0,
-                        style={'color':'##FF8200'},
-                        size='sm'
-                    ),
-                    dbc.Popover(
-                        children='This first section displays information throughout the Years for each indicator by County. Use the slider at the bottom to change the range of the Y axis. You may also isolate a line by double clicking on its legend element. ',
-                        target='click-target-1',
-                        body=True,
-                        trigger='click'
-                    )
-                ])
-            ], width=1),
             dbc.Col(
                 width=4
             ),
@@ -180,7 +162,7 @@ layout=html.Div(children=[
             dbc.Col(
                 html.Div([
                     #html.Label(['Current'], style=LABEL),
-                    daq.LEDDisplay(id='Number1', value=initialValue, color='#FF8200', labelPosition='bottom',)
+                    daq.LEDDisplay(id='Number1', value=initialValue, color='#FF8200',labelPosition='bottom',)
                 ]),width=2
                 
             ),
@@ -195,24 +177,6 @@ layout=html.Div(children=[
                     html.H1(id='profiler-title',children=[('Port Analyzer')], style={'color':'#041E42'}),
                 ])
             ], width=2),
-            dbc.Col([
-                html.Div([
-                    dbc.Button(
-                        "?",
-                        id="click-target",
-                        className="me-1",
-                        n_clicks=0,
-                        style={'color':'##FF8200'},
-                        size='sm'
-                    ),
-                    dbc.Popover(
-                        children='In this section, you can see information for every individual county at any given specific Year, as well as the distribution for every indicator at that given Year. Use the dropdowns to switch between counties and Years. You may also use the second row of the table to look for any specific value.',
-                        target='click-target',
-                        body=True,
-                        trigger='click'
-                    )
-                ])
-            ], width=1)
         ], className="g-0"),
         dbc.Row([
             dbc.Col([

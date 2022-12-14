@@ -165,11 +165,11 @@ def update_data(migrationFlow, view, dummyValue):
     if(view):
         dff=migrationDatabag.getByName('migrationCounty').getActive().copy()
         dff=filter_df(dff, 'Migration', migrationFlow)
-        fig=px.line(dff, x='Year', y='Value', color='County')
+        fig=px.line(dff, x='Year', y='Value', color='County', color_discrete_sequence=get_colors(dff['County'].unique()))
     else:
         dff=migrationDatabag.getByName('migrationState').getActive().copy()
         dff=filter_df(dff, 'Migration', migrationFlow)
-        fig=px.line(sum_df(dff, 'State', 'Year', 'Value'), x='Year', y='Value', color='State')
+        fig=px.line(sum_df(dff, 'State', 'Year', 'Value'), x='Year', y='Value', color='State', color_discrete_sequence=get_colors(dff['State'].unique()))
     fig.update_xaxes(rangeslider_visible=True)
     if(dummyValue=='Original'):
         fig.update_yaxes(tickprefix='$')

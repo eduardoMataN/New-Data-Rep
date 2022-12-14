@@ -47,6 +47,7 @@ layout=html.Div(children=[
     style=SIDEBAR_STYLE,
     )
     ], hidden=True),
+    html.Br(),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col(
