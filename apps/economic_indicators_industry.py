@@ -58,31 +58,13 @@ layout=html.Div(children=[
                 html.Div([
                     html.H2(id='title',children=['Number of Business Stablishments by Year'], style={'color':blue})
                 ])
-            )
-        ]),
-        html.Br(),
-        dbc.Row([
-            dbc.Col([
-                html.Div(children=[
-                dbc.Row([
-                    dbc.Col([
-                        html.P('Units: Thousands of Dollars (K)', style={'color':blue, 'font-weight':'bold'})
-                    ], width=4),
-                    dbc.Col([
-                        html.P('Last Update: 2022', style={'color':blue, 'font-weight':'bold'})
-                    ], width=4),
-                    dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=4)
-                ])
-            ], style={"border":"2px black solid"}),
-            ]),
+            ),
             dbc.Col([
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-stablishments', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
             ], width=2),
-        ], align='center', justify='center'),
+        ]),
         html.Br(),
         dbc.Row([
             dbc.Col(
@@ -90,6 +72,30 @@ layout=html.Div(children=[
             )
             
         ]),
+        dbc.Container([
+        dbc.Row([
+            dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        
+                    ], width=2),
+                    dbc.Col([
+                        html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Last Update: June 2022', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3)
+                ], align='center', justify='center')
+            ])
+            ]),
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
         dbc.Row([
             dbc.Col(
                 html.Div([
@@ -149,25 +155,6 @@ layout=html.Div(children=[
                 ])
             ])
         ])
-    ]),
-    dbc.Container([
-        html.Br(),
-        dbc.Row([
-            html.Div(children=[
-                dbc.Row([
-                    dbc.Col([
-                        html.P('Units: Millions of Dollars (M)', style={'color':blue, 'font-weight':'bold'})
-                    ], width=4),
-                    dbc.Col([
-                        html.P('Last Update: 2020', style={'color':blue, 'font-weight':'bold'})
-                    ], width=4),
-                    dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=4)
-                ])
-            ], style={"border":"2px black solid"})
-        ], align='center', justify='center'),
-        html.Br(),
     ]),
     dbc.Container([
         dbc.Row([
@@ -234,7 +221,31 @@ layout=html.Div(children=[
                 ])
             ])
         ]),
-    ])
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        
+                    ], width=2),
+                    dbc.Col([
+                        html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Last Update: June 2022', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3)
+                ], align='center', justify='center')
+            ])
+            ]),
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
 ])
 @app.callback(
     [Output('sidebar-space-ind','hidden'),

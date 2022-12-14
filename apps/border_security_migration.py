@@ -61,27 +61,6 @@ layout=html.Div([
     dbc.Container([
         dbc.Row([
             dbc.Col([
-            html.Div(children=[
-                dbc.Row([
-                    dbc.Col([
-                        html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
-                    ], width=4),
-                    dbc.Col([
-                        html.P('Last Update: 2018', style={'color':blue, 'font-weight':'bold'})
-                    ], width=4),
-                    dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=4)
-                ], align='center', justify='center')
-            ], style={"border":"2px black solid"})
-            ]),
-        ], align='center', justify='center'),
-        html.Br(),
-    html.Br(),
-    ]),
-    dbc.Container([
-        dbc.Row([
-            dbc.Col([
                 html.Div([
                     html.Label(['Migration Flow'], style=LABEL),
                     dcc.Dropdown(
@@ -123,7 +102,31 @@ layout=html.Div([
                 ])
             ])
         ])
-    ])
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        
+                    ], width=2),
+                    dbc.Col([
+                        html.P(' Units: Dollars in Thousands ($)', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Last Update: 2018', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3)
+                ], align='center', justify='center')
+            ])
+            ]),
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
 ])
 
 @app.callback(

@@ -82,23 +82,6 @@ layout=html.Div(children=[
                 ])
             ])
         ]),
-        html.Br(),
-        dbc.Row([
-            html.Div(children=[
-                dbc.Row([
-                    dbc.Col([
-                        html.P('Units: Millions of Dollars (M)', style={'color':blue, 'font-weight':'bold'})
-                    ], width=4),
-                    dbc.Col([
-                        html.P('Last Update: 2022', style={'color':blue, 'font-weight':'bold'})
-                    ], width=4),
-                    dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=4)
-                ])
-            ], style={"border":"2px black solid"})
-        ], align='center', justify='center'),
-        html.Br(),
         dbc.Row([
             dbc.Col([
                 html.Div([
@@ -203,6 +186,30 @@ layout=html.Div(children=[
             ])
         ])
     ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        
+                    ], width=2),
+                    dbc.Col([
+                        html.P(' Units: Dollars in Millions ($)', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Last Update: 2022', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3)
+                ], align='center', justify='center')
+            ])
+            ]),
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([
@@ -212,26 +219,6 @@ layout=html.Div(children=[
             ])
         ])
     ]),
-    dbc.Container(children=[
-        dbc.Row([
-            html.Div(children=[
-                dbc.Row([
-                    dbc.Col([
-                        html.P('Units: Thousands of Dollars (K)', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3),
-                    dbc.Col(
-                        html.P('Last Update: 2020', style={'color':blue, 'font-weight':'bold'}),
-                        width=3
-                    ),
-                    dbc.Col(
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'}),
-                        width=3
-                    )
-                ])
-            ], style={"border":"2px black solid"})
-        ]),
-    ]),
-    html.Br(),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([
@@ -266,7 +253,31 @@ layout=html.Div(children=[
                 ])
             ], width=4)
         ])
-    ])
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        
+                    ], width=2),
+                    dbc.Col([
+                        html.P(' Units: Dollars in Thousands ($)', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Last Update: 2020', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3)
+                ], align='center', justify='center')
+            ])
+            ]),
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
 ])
 @app.callback(
     

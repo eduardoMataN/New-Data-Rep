@@ -17,6 +17,7 @@ PATH = pathlib.Path(__file__).parent #So this first line is going to the parent 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
 df= pd.read_excel(DATA_PATH.joinpath("Border Crossings.xlsx"))
 borderCDataSet=dataset('Border Crossings', df, 'Value', 'graph', 'Port', 'Value')
+borderCDataSet.modify_percent_change('Measure', 'Port', 'Value')
 boderDataBag=dataBag([borderCDataSet])
 df['Value']=pd.to_numeric(df['Value'])
 df_copy=df.copy()
@@ -76,7 +77,7 @@ layout=html.Div(children=[
                 html.Div([
                     html.H1(id='section-title', children=['Border Crossings'], style={'color':'#041E42'})
                 ]),
-                width=2
+                width=3
             ),
             dbc.Col([
                 html.Div([
@@ -100,48 +101,15 @@ layout=html.Div(children=[
                 width=4
             ),
             
-            dbc.Col(
-                html.Div([
-                    #html.Label(['Current'], style=LABEL),
-                    daq.LEDDisplay(id='Number1', value=initialValue, color='#FF8200', label={'label':'Current', 'style':LABEL}, labelPosition='bottom',)
-                ]),
-                
-            ),
+            
             dbc.Col()
-        ])
+        ],className="g-0")
     ]),
     
     
-    html.Br(),
-    dbc.Container([
-        dbc.Row([
-            dbc.Col([
-            html.Div(children=[
-                dbc.Row([
-                    dbc.Col([
-                        
-                    ], width=2),
-                    dbc.Col([
-                        html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3),
-                    dbc.Col([
-                        html.P('Last Update: June 2022', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3),
-                    dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3)
-                ], align='center', justify='center')
-            ], style={"border":"2px black solid"})
-            ]),
-        ], align='center', justify='center'),
-        html.Br(),
-    html.Br(),
-    ]),
+    
     dbc.Container(children=[
         dbc.Row([
-            dbc.Col(
-                width=1
-            ),
             dbc.Col(
                 html.Div([
                     html.Label(['Indicator'], style={'font-weight':'bold', 'color':'#041E42'}),
@@ -153,14 +121,19 @@ layout=html.Div(children=[
                                 optionHeight=90)
                 ])
                 
-            ),
+            , style={'margin-right': '3px', 'margin-left': '5px'},),
             dbc.Col([
                 html.Div([
                     
                     dbc.Button('Edit Graph', id='edit-bc', outline=True, color="primary", className="me-1", value='monthly')
+                ], )
+            ], style={'margin-right': '1px', 'margin-left': '1px'},width=1),
+            dbc.Col([
+                html.Div([
+                    
+                    dbc.Button('Reset', id='reset-bc', outline=True, color="primary", className="me-1", value='reset')
                 ])
-            ], width=2)
-            
+            ], width=1, style={'margin-right': '0px', 'margin-left': '0px'})
             
         ]),
 
@@ -179,9 +152,41 @@ layout=html.Div(children=[
             
         ])
     ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        
+                    ], width=2),
+                    dbc.Col([
+                        html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Last Update: June 2022', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3)
+                ], align='center', justify='center', style={"height": "100%"}),
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Hidden', style={'color':'#FFFFFF'})
+                    ])
+                ],style={"height": "50%"})
+            ])
+            ], style={'margin-right': '3px', 'margin-left': '5px'}),
+            dbc.Col(
+                html.Div([
+                    #html.Label(['Current'], style=LABEL),
+                    daq.LEDDisplay(id='Number1', value=initialValue, color='#FF8200', labelPosition='bottom',)
+                ]),width=2
+                
+            ),
+        ], align='center', justify='center'),
     html.Br(),
-    html.Br(),
-    html.Br(),
+    ]),
     html.Br(),
     dbc.Container(children=[
         dbc.Row([
@@ -189,7 +194,7 @@ layout=html.Div(children=[
                 html.Div([
                     html.H1(id='profiler-title',children=[('Port Analyzer')], style={'color':'#041E42'}),
                 ])
-            ], width=1),
+            ], width=2),
             dbc.Col([
                 html.Div([
                     dbc.Button(
@@ -208,32 +213,7 @@ layout=html.Div(children=[
                     )
                 ])
             ], width=1)
-        ]),
-        html.Br(),
-    dbc.Container([
-        dbc.Row([
-            dbc.Col([
-            html.Div(children=[
-                dbc.Row([
-                    dbc.Col([
-                        
-                    ], width=2),
-                    dbc.Col([
-                        html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3),
-                    dbc.Col([
-                        html.P('Last Update: June 2022', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3),
-                    dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3)
-                ], align='center', justify='center')
-            ], style={"border":"2px black solid"})
-            ]),
-        ], align='center', justify='center'),
-        html.Br(),
-    html.Br(),
-    ]),
+        ], className="g-0"),
         dbc.Row([
             dbc.Col([
                 html.Div([
@@ -280,7 +260,31 @@ layout=html.Div(children=[
                 ])
             ])
         ]),
-        html.Br()
+        html.Br(),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        
+                    ], width=2),
+                    dbc.Col([
+                        html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Last Update: June 2022', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3)
+                ], align='center', justify='center')
+            ])
+            ]),
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
     ])
     
     
@@ -312,11 +316,11 @@ def show_sidebar(button, showSidebar, graphMode):
     Output(component_id='Number1', component_property='value'),  
     ],
     (Input(component_id='select-indicator', component_property='value'),
-    Input('chart-options-bc','value'))
+    Input('chart-options-bc','value'), Input('reset-bc','n_clicks'))
     
     
 )
-def update_indicator(indicator, dummyValue):
+def update_indicator(indicator, dummyValue, resetButton):
     dff=boderDataBag.getDataframe().getActive().copy()
     dff['Date'] = pd.to_datetime(df['Date'], format='%y%m')
     dff=dff[dff['Measure']==indicator]
@@ -329,7 +333,7 @@ def update_indicator(indicator, dummyValue):
     fig=px.line(dff, x='Date', y='Value', title=indicator+' by Port ', color='Port')
     fig.update_xaxes(nticks=len(pd.unique(dff['Year'])), rangeslider_visible=True)
     if(dummyValue=='PercentChange'):
-        fig.update_yaxes(ticksuffix='%')
+        fig.update_yaxes(tickformat='000',ticksuffix='%')
     
     
     
@@ -340,12 +344,12 @@ def update_indicator(indicator, dummyValue):
     
     #dff2=dff2[(dff2['Value']>=start2) & (dff2['Value']<=end2)]
     
+    dff2=boderDataBag.getDataframe().get_original().copy()
+    dff2['Date'] = pd.to_datetime(df['Date'], format='%y%m')
+    dff2=dff2[dff2['Measure']==indicator]
+    dff2=dff2[dff2['Year']==dff2['Year'].max()]
     
-    
-    
-    dff=dff[dff['Year']==dff['Year'].max()]
-    
-    return fig, sum(dff['Value'])
+    return fig, sum(dff2['Value'])
 
 
 

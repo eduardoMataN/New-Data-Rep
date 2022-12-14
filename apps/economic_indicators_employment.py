@@ -110,7 +110,7 @@ layout=html.Div(children=[
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
                     )
                 ])
-            ], style={"border":"2px black solid"})
+            ], )
         ]),
         html.Br(),
         dbc.Row([
@@ -173,7 +173,31 @@ layout=html.Div(children=[
                 ])
             ])
         ])
-    ])
+    ]),
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([
+            html.Div(children=[
+                dbc.Row([
+                    dbc.Col([
+                        
+                    ], width=2),
+                    dbc.Col([
+                        html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Last Update: 2020', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3),
+                    dbc.Col([
+                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                    ], width=3)
+                ], align='center', justify='center')
+            ])
+            ]),
+        ], align='center', justify='center'),
+        html.Br(),
+    html.Br(),
+    ]),
 ])
 
 @app.callback(

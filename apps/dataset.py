@@ -13,6 +13,8 @@ class dataset:
         self.df_active=df_original
         self.name=name
         self.active_mode='Original'
+    def get_original(self):
+        return self.df_original
 
     def activateDataframe(self, mode):
         if(mode=='Original'):

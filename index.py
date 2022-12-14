@@ -17,7 +17,7 @@ app.layout=html.Div(children=[dcc.Location(id='url', refresh=False),
     dbc.NavbarSimple(children=[
     dbc.DropdownMenu(
         [
-            dbc.DropdownMenuItem('Sub1',href='/apps/demographic_indicators'), 
+             
             dbc.DropdownMenuItem('Population', href='/apps/demographic_indicators_population') 
         ],
         label='Demographic Indicators',
@@ -100,8 +100,6 @@ app.layout=html.Div(children=[dcc.Location(id='url', refresh=False),
 def display_page(pathname):
     if pathname == '/apps/border_security':
         return border_security.layout
-    if pathname == '/apps/demographic_indicators':
-        return demographic_indicators.layout
     if pathname == '/apps/economic_indicators':
         return economic_indicators_trade.layout
     if pathname == '/apps/education':
@@ -137,7 +135,7 @@ def display_page(pathname):
     if pathname == '/apps/border_security_migration':
         return border_security_migration.layout
     else:
-        return transportation_border_crossings.layout
+        return economic_indicators_income.layout
 
 
 
