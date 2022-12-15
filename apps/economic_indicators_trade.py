@@ -192,9 +192,6 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        
-                    ], width=2),
-                    dbc.Col([
                         html.P(' Units: Dollars in Millions ($)', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
@@ -202,7 +199,13 @@ layout=html.Div(children=[
                     ], width=3),
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3)
+                    ], width=3),
+                    dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-trade', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-trade')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
                 ], align='center', justify='center')
             ])
             ]),
@@ -260,9 +263,6 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        
-                    ], width=2),
-                    dbc.Col([
                         html.P(' Units: Dollars in Thousands ($)', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
@@ -270,7 +270,13 @@ layout=html.Div(children=[
                     ], width=3),
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3)
+                    ], width=3),
+                    dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-trade2', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-trade2')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
                 ], align='center', justify='center')
             ])
             ]),
@@ -279,6 +285,25 @@ layout=html.Div(children=[
     html.Br(),
     ]),
 ])
+
+@app.callback(
+    Output('download-trade','data'),
+    Input('download-bttn-trade', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB): #THERE ARE TWO DATA FRAMES. SHOULD WE APPEND THEM. 
+
+    return dcc.send_data_frame(pd.concat([df_trade_naics, df_trade_hs]).to_excel, 'Imports & Exports by HS/NAICS Commodities.xlsx')
+
+@app.callback(
+    Output('download-trade2','data'),
+    Input('download-bttn-trade2', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB):
+
+    return dcc.send_data_frame(df_ep.to_excel, 'Total Flows to El Paso.xlsx')
+
 @app.callback(
     
     [Output('sidebar-space-trade', 'hidden'),

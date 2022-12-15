@@ -152,8 +152,14 @@ layout=html.Div(children=[
             dbc.Col([
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-income', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
-                ])
-            ], width=2)
+                ], style={"padding": "0rem 0rem"})
+            ], style={'margin-left': '0px', "padding": "0px 0px"}, width=1),
+            dbc.Col([
+                html.Div([
+                    dbc.Button('Download Dataset', id='download-bttn-income', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                ]),
+                dcc.Download(id='download-income')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'})
             
         ])
     ]),
@@ -224,7 +230,13 @@ layout=html.Div(children=[
                     optionHeight=90)
                     
                 ])
-            )
+            ),
+            dbc.Col([
+                html.Div([
+                    dbc.Button('Download Dataset', id='download-bttn-income2', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                ]),
+                dcc.Download(id='download-income2')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'})
             
         ])
     ]),
@@ -281,6 +293,12 @@ layout=html.Div(children=[
             dbc.Col(
                 html.H2("Revenues by Workers Remittances. Chihuahua, Juarez.", style={'color':'#041E42'})
             ),
+            dbc.Col([
+                html.Div([
+                    dbc.Button('Download Dataset', id='download-bttn-income3', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                ]),
+                dcc.Download(id='download-income3')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
         ]),
         dbc.Row([
             dbc.Col(
@@ -323,8 +341,35 @@ layout=html.Div(children=[
 
 )
 @app.callback(
+    Output('download-income3','data'),
+    Input('download-bttn-income3', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB):
+
+    return dcc.send_data_frame(df_revenues.to_excel, 'Revenues by Workers Remittances. Chihuahua, Juarez.xlsx')
+
+@app.callback(
+    Output('download-income2','data'),
+    Input('download-bttn-income2', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB):
+
+    return dcc.send_data_frame(df_income.to_excel, 'Household Family Income by Zip Code.xlsx')
+
+@app.callback(
+    Output('download-income','data'),
+    Input('download-bttn-income', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB):
+
+    return dcc.send_data_frame(df_median.to_excel, 'Median Household & Personal Income.xlsx')
+
+@app.callback(
     [Output('sidebar-space-income','hidden'),
-    Output('sidebar-title-income', 'children')],
+    Output('sidebar-title-income', 'children'),],
     [Input('edit-income', 'n_clicks'),
     Input('select-indicator','value'),
     Input('sidebar-space-income', 'hidden'),
@@ -333,12 +378,14 @@ layout=html.Div(children=[
 )
 def get_sidebar(button, indicatorValue, hideSideBar, graphMode, title):
     trigger_id=ctx.triggered_id
+    
     if(trigger_id=='edit-income'):
         if(hideSideBar):
             hideSideBar=False
         else:
             hideSideBar=True
         title=incomeDatabag.getByName(indicatorValue).title
+    
     
     incomeDatabag.getByName(indicatorValue).activateDataframe(graphMode)
 
