@@ -27,6 +27,7 @@ gdpDatasetIndustry=dataset('GDP by County for Industries Chart', df_gdp, 'GDP', 
 gdpDatasetIndustry.modify_percent_change('Description','County', 'GDP')
 industryDatabag=dataBag([stabDataset, gdpDatasetIndustry, gdpDatasetCounty])
 layout=html.Div(children=[
+    html.Br(),
     dbc.Container(children=[
         html.Div(id='sidebar-space-ind',children=[
         html.Div(
@@ -64,6 +65,12 @@ layout=html.Div(children=[
                     dbc.Button('Edit Graph', id='edit-stablishments', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
             ], width=2),
+            dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-ind', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-ind')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'})
         ]),
         html.Br(),
         dbc.Row([
