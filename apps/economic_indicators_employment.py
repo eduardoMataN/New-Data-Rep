@@ -23,6 +23,7 @@ employmentDataset.modify_percent_change('County', 'Description', 'Value')
 employmentDatabag=dataBag([employmentDataset])
 df_total=pd.read_excel(DATA_PATH.joinpath("Total Employment by County, LBS.xlsx"))
 df_unemp=pd.read_excel(DATA_PATH.joinpath("Unemployment by County.xlsx"))
+universal_df=pd.concat([df_total, df_emp, df_unemp])
 
 
 
@@ -98,22 +99,6 @@ layout=html.Div(children=[
         ]),
         html.Br(),
         dbc.Row([
-            html.Div(children=[
-                dbc.Row([
-                    dbc.Col([
-                        html.P('Units: Amount of Individuals', style={'color':blue, 'font-weight':'bold'})
-                    ]),
-                    dbc.Col(
-                        html.P('Last Update: March 2022', style={'color':blue, 'font-weight':'bold'})
-                    ),
-                    dbc.Col(
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    )
-                ])
-            ], )
-        ]),
-        html.Br(),
-        dbc.Row([
             dbc.Col([
                 html.Div([
                         html.Label(['County'], style={'font-weight':'bold', 'color':'#041E42'}),
@@ -158,7 +143,13 @@ layout=html.Div(children=[
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-emp', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
-            ], width=2)
+            ], width=1),
+            dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-emp', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-emp')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'})
             
         ])
     ]),
@@ -186,7 +177,7 @@ layout=html.Div(children=[
                         html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
-                        html.P('Last Update: 2020', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Last Update: March 2020', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
@@ -199,6 +190,14 @@ layout=html.Div(children=[
     html.Br(),
     ]),
 ])
+@app.callback(
+    Output('download-emp','data'),
+    Input('download-bttn-emp', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB): 
+ 
+    return dcc.send_data_frame(universal_df.to_excel, 'Employment Data.xlsx') 
 
 @app.callback(
     Output('sidebar-space-emp','hidden'),
