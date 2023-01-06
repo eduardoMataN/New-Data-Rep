@@ -109,13 +109,14 @@ layout=html.Div(children=[
                     
                     dbc.Button('Edit Graph', id='edit-bc', outline=True, color="primary", className="me-1", value='monthly')
                 ], )
-            ], style={'margin-right': '1px', 'margin-left': '1px'},width=1),
+            ], style={'margin-right': '1px', 'margin-left': '1px'},width=2),
             dbc.Col([
                 html.Div([
                     
                     dbc.Button('Reset', id='reset-bc', outline=True, color="primary", className="me-1", value='reset')
                 ])
-            ], width=1, style={'margin-right': '0px', 'margin-left': '0px'})
+            ], width=1, style={'margin-right': '0px', 'margin-left': '0px'}),
+            
             
         ]),
 
@@ -140,9 +141,6 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        
-                    ], width=2),
-                    dbc.Col([
                         html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
@@ -150,7 +148,13 @@ layout=html.Div(children=[
                     ], width=3),
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3)
+                    ], width=3),
+                    dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-bc', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-bc')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'})
                 ], align='center', justify='center', style={"height": "100%"}),
                 dbc.Row([
                     dbc.Col([
@@ -258,6 +262,15 @@ layout=html.Div(children=[
     
 ]
 )
+@app.callback(
+    Output('download-bc','data'),
+    Input('download-bttn-bc', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB): 
+ 
+    return dcc.send_data_frame(df.to_excel, 'Border Crossings.xlsx') 
+
 @app.callback(
     Output('sidebar-space-bc','hidden'),
     [Input('edit-bc','n_clicks'),

@@ -60,7 +60,13 @@ layout=html.Div(children=[
                     dbc.Button('Edit Graph', id='edit-rem', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
             
-            ], width=2)
+            ], width=2),
+            dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-rem', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-rem')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
         ]),
         html.Br(),
         dbc.Row([
@@ -94,6 +100,15 @@ layout=html.Div(children=[
     ]),
     ])
 ])
+@app.callback(
+    Output('download-rem','data'),
+    Input('download-bttn-rem', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB): 
+ 
+    return dcc.send_data_frame(df_rem.to_excel, 'Revenues by Workers Remittances Data.xlsx')
+
 
 @app.callback(
     Output('sidebar-space-rem','hidden'),

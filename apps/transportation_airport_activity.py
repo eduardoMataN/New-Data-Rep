@@ -102,9 +102,7 @@ layout=html.Div(children=[
             dbc.Col([
             html.Div(children=[
                 dbc.Row([
-                    dbc.Col([
-                        
-                    ], width=2),
+                    
                     dbc.Col([
                         html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
@@ -113,7 +111,13 @@ layout=html.Div(children=[
                     ], width=3),
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3)
+                    ], width=3),
+                    dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-air', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-air')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'})
                 ], align='center', justify='center')
             ])
             ]),
@@ -164,9 +168,6 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        
-                    ], width=2),
-                    dbc.Col([
                         html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
@@ -174,7 +175,13 @@ layout=html.Div(children=[
                     ], width=3),
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3)
+                    ], width=3),
+                    dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-air2', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-air2')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'})
                 ], align='center', justify='center')
             ])
             ]),
@@ -183,6 +190,23 @@ layout=html.Div(children=[
     html.Br(),
     ]),
 ])
+@app.callback(
+    Output('download-air','data'),
+    Input('download-bttn-air', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB): 
+ 
+    return dcc.send_data_frame(df_domes_int.to_excel, 'Domestic and International Air Passengers Data.xlsx')
+
+@app.callback(
+    Output('download-air2','data'),
+    Input('download-bttn-air2', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB): 
+ 
+    return dcc.send_data_frame(df_ep.to_excel, 'El Paso Passengers Statistics.xlsx')
 
 @app.callback(
     [Output('bar-air', 'figure'),

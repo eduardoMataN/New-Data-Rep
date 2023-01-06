@@ -48,7 +48,7 @@ layout=html.Div(children=[
     ],
     style=SIDEBAR_STYLE,
     )
-    ], hidden=True, style={'zIndex':'999'}),
+    ], hidden=True, style={'z-index':'999'}),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([
@@ -113,7 +113,13 @@ layout=html.Div(children=[
                     
                     dbc.Button('Edit Graph', id='edit-crime', outline=True, color="primary", className="me-1", value='edit')
                 ])
-            ], width=2)
+            ]),
+            dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-crime', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-crime')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'})
         ]),
         dbc.Row([
             dbc.Col(
@@ -132,9 +138,6 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        
-                    ], width=2),
-                    dbc.Col([
                         html.P(' Units: Crimes', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
@@ -142,7 +145,7 @@ layout=html.Div(children=[
                     ], width=3),
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3)
+                    ], width=3),
                 ], align='center', justify='center')
             ])
             ]),
@@ -151,6 +154,14 @@ layout=html.Div(children=[
     html.Br(),
     ]),
 ])
+@app.callback(
+    Output('download-crime','data'),
+    Input('download-bttn-crime', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB): 
+ 
+    return dcc.send_data_frame(df_crime.to_excel, 'Crime Data.xlsx') 
 
 @app.callback(
     

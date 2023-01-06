@@ -148,18 +148,18 @@ layout=html.Div(children=[
                     optionHeight=90,
                     disabled=True)
                 ])
-            ),
+            , width=3),
             dbc.Col([
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-income', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ], style={"padding": "0rem 0rem"})
-            ], style={'margin-left': '0px', "padding": "0px 0px"}, width=1),
+            ], style={'margin-left': '0px', "padding": "0px 0px"}, width=2),
             dbc.Col([
                 html.Div([
                     dbc.Button('Download Dataset', id='download-bttn-income', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ]),
                 dcc.Download(id='download-income')
-            ],  style={'margin-left': '0px', 'margin-right':'1px'})
+            ],  style={'margin-left': '0px', 'margin-right':'0px'})
             
         ])
     ]),

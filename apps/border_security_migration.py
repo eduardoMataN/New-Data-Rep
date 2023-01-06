@@ -88,7 +88,13 @@ layout=html.Div([
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-migration', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
-            ], width=2)
+            ], width=2),
+            dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-mig', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-mig')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
         ])
     ]),
     dbc.Container([
@@ -128,6 +134,15 @@ layout=html.Div([
     html.Br(),
     ]),
 ])
+
+@app.callback(
+    Output('download-mig','data'),
+    Input('download-bttn-mig', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB): 
+ 
+    return dcc.send_data_frame(df_migration.to_excel, 'Revenues by Workers Remittances Data.xlsx')
 
 @app.callback(
     [Output('sidebar-space-migration','hidden'),

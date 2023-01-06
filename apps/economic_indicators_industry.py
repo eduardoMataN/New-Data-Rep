@@ -70,7 +70,7 @@ layout=html.Div(children=[
                         dbc.Button('Download Dataset', id='download-bttn-ind', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                     ]),
                     dcc.Download(id='download-ind')
-            ],  style={'margin-left': '0px', 'margin-right':'1px'})
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
         ]),
         html.Br(),
         dbc.Row([
@@ -214,7 +214,13 @@ layout=html.Div(children=[
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-gdp', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
-            ], width=2)
+            ], width=2),
+            dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-ind-2', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-ind-2')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
         ])
     ]),
     dbc.Container([
@@ -254,6 +260,24 @@ layout=html.Div(children=[
     html.Br(),
     ]),
 ])
+@app.callback(
+    Output('download-ind','data'),
+    Input('download-bttn-ind', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB): 
+ 
+    return dcc.send_data_frame(df_est.to_excel, 'Number of Business Stablishments by Year Data.xlsx')
+
+@app.callback(
+    Output('download-ind-2','data'),
+    Input('download-bttn-ind-2', 'n_clicks'),
+    prevent_initial_call=True
+)
+def download_median(downloadB): 
+ 
+    return dcc.send_data_frame(df_gdp.to_excel, 'GDP By Industry for Border Counties Data.xlsx')
+
 @app.callback(
     [Output('sidebar-space-ind','hidden'),
     Output('sidebar-title-ind','children')],

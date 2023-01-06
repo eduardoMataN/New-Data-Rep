@@ -14,6 +14,7 @@ from plotly.subplots import make_subplots
 from apps.common_items import *
 from apps.dataset import *
 from apps.dataBag import *
+from dash.exceptions import PreventUpdate
 DATA_PATH = PATH.joinpath("../datasets/Border Patrol Agent Staffing").resolve()
 
 df_region=pd.read_excel(DATA_PATH.joinpath('Staffing by region.xlsx'))
@@ -60,7 +61,13 @@ layout=html.Div([
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-staff', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
-            ], width=2)
+            ], width=2),
+            dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-staff', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-staff')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
         ])
     ]),
     dbc.Container([
@@ -111,6 +118,24 @@ layout=html.Div([
     html.Br(),
     ]),
 ])
+
+
+
+@app.callback(
+    Output('download-staff','data'),
+    [Input('download-bttn-staff', 'n_clicks'),
+    Input('select-indicator', 'value')],
+    prevent_initial_call=True
+)
+def download_median(downloadB, tab): 
+    trigger_id=ctx.triggered_id 
+    if(trigger_id=='select-indicator'):
+        raise PreventUpdate
+    else:
+        if(tab=='region'):
+            return dcc.send_data_frame(df_region.to_excel, 'Border Patrol Agent Staffing by Region.xlsx')
+        else:
+            return dcc.send_data_frame(df_sector.to_excel, 'Border Patrol Agent Staffing by Sector.xlsx')
 
 @app.callback(
     [Output('sidebar-space-staff','hidden'),

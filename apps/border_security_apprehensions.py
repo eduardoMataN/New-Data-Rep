@@ -14,6 +14,7 @@ from plotly.subplots import make_subplots
 from apps.common_items import *
 from apps.dataset import *
 from apps.dataBag import *
+from dash.exceptions import PreventUpdate
 DATA_PATH = PATH.joinpath("../datasets/Apprehensions").resolve()
 
 df_cit=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Citizenship.xlsx'))
@@ -139,7 +140,13 @@ layout=html.Div([
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-yearly', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
-            ], width=2)
+            ], width=2),
+            dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-app', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-app')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
         ]),
        
     ]),
@@ -215,7 +222,13 @@ layout=html.Div([
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-monthly', outline=True, color="primary", className="me-1", value='monthly')
                 ])
-            ], width=2)
+            ], width=2),
+            dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-app-2', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-app-2')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
         ])
     ]),
     dbc.Container([
@@ -289,7 +302,13 @@ layout=html.Div([
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-southwest', outline=True, color="primary", className="me-1", value='southwest')
                 ])
-            ], width=2)
+            ], width=2),
+            dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-app-3', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-app-3')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
         ])
     ]),
     dbc.Container([
@@ -329,6 +348,52 @@ layout=html.Div([
     html.Br(),
     ]),
 ])
+@app.callback(
+    Output('download-app','data'),
+    [Input('download-bttn-app', 'n_clicks'),
+    Input('app-tabs', 'value')],
+    prevent_initial_call=True
+)
+def download_median(downloadB, tab): 
+    trigger_id=ctx.triggered_id 
+    if(trigger_id=='app-tabs'):
+        raise PreventUpdate
+    else:
+        if(tab=='tab-cit'):
+            return dcc.send_data_frame(df_cit.to_excel, 'Yearly Apprehensions by Sector and Citizenship.xlsx')
+        else:
+            return dcc.send_data_frame(df_country.to_excel, 'Yearly Apprehensions by Sector and Country.xlsx')
+@app.callback(
+    Output('download-app-2','data'),
+    [Input('download-bttn-app-2', 'n_clicks'),
+    Input('monthly-tabs', 'value')],
+    prevent_initial_call=True
+)
+def download_median(downloadB, tab): 
+    trigger_id=ctx.triggered_id 
+    if(trigger_id=='monthly-tabs'):
+        raise PreventUpdate
+    else:
+        if(tab=='family-unit'):
+            return dcc.send_data_frame(df_family.to_excel, 'Monthly Family Unit Apprehensions by Sector.xlsx')
+        else:
+            return dcc.send_data_frame(df_uac.to_excel, 'Monthly UUC Apprehensions by Sector.xlsx')
+@app.callback(
+    Output('download-app-3','data'),
+    [Input('download-bttn-app-3', 'n_clicks'),
+    Input('south-tabs', 'value')],
+    prevent_initial_call=True
+)
+def download_median(downloadB, tab): 
+    trigger_id=ctx.triggered_id 
+    if(trigger_id=='south-tabs'):
+        raise PreventUpdate
+    else:
+        if(tab=='apps'):
+            return dcc.send_data_frame(df_southwesta.to_excel, 'Southwest Border Apprehensions by Sector.xlsx')
+        else:
+            return dcc.send_data_frame(df_southwestb.to_excel, 'Southwest Border Deaths by Sector.xlsx')
+
 @app.callback(
     [Output('sidebar-space','hidden'),
     Output('dummy1','children'),

@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import dash as dash
 from dash import dcc, ctx
-from dash import html, dash_table
+from dash import html, dash_table, no_update
 import dash_bootstrap_components as dbc
 import dash_daq as daq
 from dash.dependencies import Input, Output, State
@@ -14,6 +14,7 @@ from plotly.subplots import make_subplots
 from apps.common_items import *
 from apps.dataset import *
 from apps.dataBag import *
+from dash.exceptions import PreventUpdate
 
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
@@ -113,9 +114,6 @@ layout=html.Div([
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        
-                    ], width=2),
-                    dbc.Col([
                         html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
@@ -123,7 +121,13 @@ layout=html.Div([
                     ], width=3),
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3)
+                    ], width=3),
+                    dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-pov', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-pov')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'})
                 ], align='center', justify='center')
             ])
             ]),
@@ -134,7 +138,24 @@ layout=html.Div([
     ])
 ])
 
-
+@app.callback(
+    Output('download-pov','data'),
+    [Input('download-bttn-pov', 'n_clicks'),
+    Input('poverty-tabs','value')],
+    prevent_initial_call=True
+)
+def download_median(downloadB, currentTab):
+    trigger_id=ctx.triggered_id
+    if(trigger_id=='poverty-tabs'):
+        return no_update
+    if(currentTab=='tab-age'):
+        return dcc.send_data_frame(df_age.to_excel, 'Povery by Age Data.xlsx')
+    if(currentTab=='tab-race'):
+        return dcc.send_data_frame(df_race.to_excel, 'Povery by Age Data.xlsx')
+    if(currentTab=='tab-sex'):
+        return dcc.send_data_frame(df_sex.to_excel, 'Povery by Age Data.xlsx')
+    if(currentTab=='tab-educ'):
+        return dcc.send_data_frame(df_educ.to_excel, 'Povery by Age Data.xlsx')
 
 @app.callback(
     [Output('section-title', 'children'),
