@@ -113,13 +113,7 @@ layout=html.Div(children=[
                     
                     dbc.Button('Edit Graph', id='edit-crime', outline=True, color="primary", className="me-1", value='edit')
                 ])
-            ]),
-            dbc.Col([
-                    html.Div([
-                        dbc.Button('Download Dataset', id='download-bttn-crime', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
-                    ]),
-                    dcc.Download(id='download-crime')
-            ],  style={'margin-left': '0px', 'margin-right':'1px'})
+            ])
         ]),
         dbc.Row([
             dbc.Col(
@@ -146,6 +140,12 @@ layout=html.Div(children=[
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
+                    dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-crime', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-crime')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
                 ], align='center', justify='center')
             ])
             ]),

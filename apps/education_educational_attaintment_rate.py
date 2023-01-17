@@ -83,12 +83,6 @@ layout=html.Div(children=[
                     dbc.Button('Edit Graph', id='edit-educ', outline=True, color="primary", className="me-1", value='edit')
                 ])
             ], width=2),
-            dbc.Col([
-                    html.Div([
-                        dbc.Button('Download Dataset', id='download-bttn-educ', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
-                    ]),
-                    dcc.Download(id='download-educ')
-            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
         ])
     ]),
     dbc.Container([
@@ -148,7 +142,12 @@ layout=html.Div(children=[
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
-                    
+                    dbc.Col([
+                    html.Div([
+                        dbc.Button('Download Dataset', id='download-bttn-educ', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                    ]),
+                    dcc.Download(id='download-educ')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
                 ], align='center', justify='center')
             ])
             ]),

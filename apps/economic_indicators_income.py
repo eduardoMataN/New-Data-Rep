@@ -153,13 +153,7 @@ layout=html.Div(children=[
                 html.Div([
                     dbc.Button('Edit Graph', id='edit-income', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ], style={"padding": "0rem 0rem"})
-            ], style={'margin-left': '0px', "padding": "0px 0px"}, width=2),
-            dbc.Col([
-                html.Div([
-                    dbc.Button('Download Dataset', id='download-bttn-income', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
-                ]),
-                dcc.Download(id='download-income')
-            ],  style={'margin-left': '0px', 'margin-right':'0px'})
+            ], style={'margin-left': '0px', "padding": "0px 0px"}, width=2)
             
         ])
     ]),
@@ -178,9 +172,6 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        
-                    ], width=2),
-                    dbc.Col([
                         html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
@@ -188,7 +179,13 @@ layout=html.Div(children=[
                     ], width=3),
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3)
+                    ], width=3),
+                    dbc.Col([
+                html.Div([
+                    dbc.Button('Download Dataset', id='download-bttn-income', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                ]),
+                dcc.Download(id='download-income')
+            ],  style={'margin-left': '0px', 'margin-right':'0px'}, width=2)
                 ], align='center', justify='center')
             ])
             ]),
@@ -230,13 +227,7 @@ layout=html.Div(children=[
                     optionHeight=90)
                     
                 ])
-            ),
-            dbc.Col([
-                html.Div([
-                    dbc.Button('Download Dataset', id='download-bttn-income2', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
-                ]),
-                dcc.Download(id='download-income2')
-            ],  style={'margin-left': '0px', 'margin-right':'1px'})
+            )
             
         ])
     ]),
@@ -270,9 +261,6 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        
-                    ], width=2),
-                    dbc.Col([
                         html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
@@ -280,7 +268,13 @@ layout=html.Div(children=[
                     ], width=3),
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3)
+                    ], width=3),
+                    dbc.Col([
+                html.Div([
+                    dbc.Button('Download Dataset', id='download-bttn-income2', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                ]),
+                dcc.Download(id='download-income2')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
                 ], align='center', justify='center')
             ])
             ]),
@@ -292,13 +286,7 @@ layout=html.Div(children=[
         dbc.Row([
             dbc.Col(
                 html.H2("Revenues by Workers Remittances. Chihuahua, Juarez.", style={'color':'#041E42'})
-            ),
-            dbc.Col([
-                html.Div([
-                    dbc.Button('Download Dataset', id='download-bttn-income3', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
-                ]),
-                dcc.Download(id='download-income3')
-            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
+            )
         ]),
         dbc.Row([
             dbc.Col(
@@ -312,9 +300,6 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        
-                    ], width=2),
-                    dbc.Col([
                         html.P(' Units: Dollars in Millions ($)', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
@@ -322,7 +307,13 @@ layout=html.Div(children=[
                     ], width=3),
                     dbc.Col([
                         html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
-                    ], width=3)
+                    ], width=3),
+                    dbc.Col([
+                html.Div([
+                    dbc.Button('Download Dataset', id='download-bttn-income3', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
+                ]),
+                dcc.Download(id='download-income3')
+            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
                 ], align='center', justify='center')
             ])
             ]),
