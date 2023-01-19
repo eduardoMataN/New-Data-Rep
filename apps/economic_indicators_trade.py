@@ -66,6 +66,14 @@ layout=html.Div(children=[
             value='Original',
             
         ),
+        html.Label('Max Y Value:', style=LABEL),
+        dcc.Input(id='max_input', type='number', min=10, max=1000, value=150),
+        html.Label('Min Y Value:', style=LABEL),
+        dcc.Input(id='min_input', type='number', min=10, max=1000, value=150),
+        html.Br(),
+        html.Br(),
+        dbc.Button('Reset', id='reset-trade', outline=True, color="primary", className="me-1", value='reset', n_clicks=0)
+                    
         
 
 
@@ -78,7 +86,7 @@ layout=html.Div(children=[
         dbc.Row([
             dbc.Col([
                 html.Div([
-                    html.H2(['Imports & Exports by HS/NAICS Commodities'], style=TITLE)
+                    html.H2(id='dummy_trade',children=['Imports & Exports by HS/NAICS Commodities'], style=TITLE)
                 ])
             ])
         ]),
@@ -307,15 +315,22 @@ def download_median(downloadB):
 @app.callback(
     
     [Output('sidebar-space-trade', 'hidden'),
-    Output('sidebar-title-trade', 'children')],
+    Output('sidebar-title-trade', 'children'),
+    Output('max_input', 'max'),
+    Output('max_input', 'min'),
+    Output('min_input', 'max'),
+    Output('min_input','min'),
+    Output('max_input','value'),
+    Output('min_input','value')],
     [Input('edit-trade-impex', 'n_clicks'),
     Input('sidebar-space-trade', 'hidden'),
-    Input('chart-options-trade', 'value'),
     Input('toggle-int-2', 'value'),
     Input('toggle-int','value'),
-    Input('sidebar-title-trade', 'children')]
+    Input('reset-trade','n_clicks'),
+    Input('max_input','value'),
+    Input('min_input','value')]
 )
-def get_sidebar(buttonimpEx, showSideBar, chartMode, hsNaics, impExp, title):
+def get_sidebar(buttonimpEx, showSideBar, hsNaics, impExp, reset, max, min):
     trigger_id=ctx.triggered_id
     name='hsImports'
     if(buttonimpEx):
@@ -330,10 +345,55 @@ def get_sidebar(buttonimpEx, showSideBar, chartMode, hsNaics, impExp, title):
                 name='hsExports'
             else:
                 name='hsImports'
+    currentDataset=tradeDatabag.getByName(name)
+    currMin=currentDataset.min
+    currMax=currentDataset.max
+    title=currentDataset.title
+    if(currentDataset.isTrimmed()):
+        currentValueMax=currentDataset.trimMax
+        currentValueMin=currentDataset.trimMin
+        minMax=currentDataset.trimMax-1
+        maxMin=currentDataset.trimMin-1
 
-    tradeDatabag.getByName(name).activateDataframe(chartMode)
-    title=tradeDatabag.getByName(name).title
-    return showSideBar, title
+    else:
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        minMax=currentDataset.max-1
+        maxMin=currentDataset.min+1
+    if(trigger_id=='reset-trade'):
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        showSideBar=False
+    if(trigger_id=='max_input' or trigger_id=='min_input'):
+        minMax=max-1
+        maxMin=min+1
+        currentValueMax=max
+        currentValueMin=min
+        showSideBar=False
+    
+
+
+
+
+    
+    return showSideBar, title, currMax, maxMin, minMax, currMin, currentValueMax, currentValueMin
+@app.callback(
+    Output('dummy_trade','children'),
+    [Input('chart-options-trade','value'),
+    Input('max_input','value'),
+    Input('min_input','value'),
+    Input('sidebar-title-trade','children'),
+    Input('reset-trade','n_clicks'),
+    ]
+)
+def change_chart(chartMode, max, min, title, reset):
+    trigger_id=ctx.triggered_id
+    tradeDatabag.getDataframe(title).activateDataframe(chartMode)
+    if(trigger_id=='max_input' or trigger_id=='min_input'):
+        tradeDatabag.getDataframe(title).trim(max, min)
+    if(trigger_id=='reset-trade'):
+        tradeDatabag.getDataframe(title).reset()
+
 
 @app.callback(
     [
@@ -365,19 +425,26 @@ def get_sidebar(buttonimpEx, showSideBar, chartMode, hsNaics, impExp, title):
         Input('compare-port2','options'),
         Input('select-mode-int','value'),
         Input('chart-options-trade', 'value'),
-        Input('sidebar-title-trade', 'children')
+        Input('sidebar-title-trade', 'children'),
+        Input('max_input','value'),
+        Input('min_input','value'),
+        Input('reset-trade','n_clicks')
     ]
 )
-def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleImEx,toggleHsNaics, portValue1, portValue2, commodityOptions, portOptions1, portOptions2, mode, dummyValue, sideBarTitle):
+def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleImEx,toggleHsNaics, portValue1, portValue2, commodityOptions, portOptions1, portOptions2, mode, dummyValue, sideBarTitle, dummyMax, dummyMin, dummyReset):
     #Chunk to update Top Part of Page. 
     comparePort1=True
     comparePort2=True
     importsToggle=False
     naicsDropdown=True
     trigger_id=ctx.triggered_id
-    dff=tradeDatabag.getDataframe(sideBarTitle).getActive().copy()
+    currentDataset=tradeDatabag.getDataframe(sideBarTitle)
+    dff=currentDataset.getActive().copy()
     if(toggleHsNaics==True):
-        #dff=df_trade_naics.copy()
+        if(currentDataset.isTrimmed()):
+            max=currentDataset.trimMax
+            min=currentDataset.trimMin
+            dff=dff[(dff['Value']>=min)&(dff['Value']<=max)]
         naicsDropdown=False
         importsToggle=True
         if(trigger_id=='toggle-int-2'):
@@ -404,7 +471,13 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
             fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Value', color='District', color_discrete_sequence=get_colors(dff['District'].unique()))
             
     else:
-        #dff=df_trade_hs.copy()
+        if(currentDataset.isTrimmed()):
+            max=currentDataset.trimMax
+            min=currentDataset.trimMin
+            if(toggleImEx):
+                dff=dff[(dff['Exports']>=min)&(dff['Exports']<=max)]
+            else:
+                dff=dff[(dff['Imports']>=min)&(dff['Imports']<=max)]
         if(trigger_id=='toggle-int-2'):
             measureOptions=[{'label':x,'value':x}for x in dff['Measures'].unique()]
             measureValue=dff['Measures'].unique()[0]
