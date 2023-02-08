@@ -82,10 +82,10 @@ layout=html.Div(children=[
                         html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
-                        html.P('Last Update: June 2022', style={'color':blue, 'font-weight':'bold'})
+                        html.P(id='chartmode',children='Last Update: June 2022', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                        html.P(id='experiment',children='Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
                     html.Div([
@@ -275,14 +275,15 @@ def download_median(downloadB):
 
 @app.callback(
     [Output('sidebar-space-ind','hidden'),
-    Output('sidebar-title-ind','children')],
+    Output('sidebar-title-ind','children'),
+    Output('chartmode','children')],
     [Input('sidebar-space-ind', 'hidden'),
     Input('edit-gdp','n_clicks'),
     Input('edit-stablishments', 'n_clicks'),
     Input('chart-options-ind','value'),
     Input('county-button', 'on'),
     Input('industry-button','on'),
-    Input('sidebar-title-ind','children')]
+    Input('sidebar-title-ind','children'),]
 )
 def get_sidebar(hideSideBar, button, button2, chartMode, countyButton, industryButton, title):
     trigger_id=ctx.triggered_id
@@ -301,12 +302,12 @@ def get_sidebar(hideSideBar, button, button2, chartMode, countyButton, industryB
             title=industryDatabag.get_title_by_name('gdpCounty')
         if(industryButton):
             title=industryDatabag.get_title_by_name('gdpDesc')
-    print(chartMode)
+    #print(chartMode)
     industryDatabag.getDataframe(title).activateDataframe(chartMode)
         
     
             
-    return hideSideBar, title
+    return hideSideBar, title, industryDatabag.getDataframe(title).getActiveMode()
 
 @app.callback(
     
@@ -317,7 +318,8 @@ def get_sidebar(hideSideBar, button, button2, chartMode, countyButton, industryB
         Output('county-button','on'),
         Output('select-county-gdp','disabled'),
         Output('industry-button','on'),
-        Output('select-industry-gdp','disabled')]
+        Output('select-industry-gdp','disabled'),
+        Output('experiment','children')]
     ,
     
         [Input('title', 'children'), Input('select-county-ind', 'value'),
@@ -331,7 +333,8 @@ def get_sidebar(hideSideBar, button, button2, chartMode, countyButton, industryB
 )
 def update_data(title, countyT,yearT, countyOn, countyValue, industryOn, industryValue, dummyValue):
     trigger_id=ctx.triggered_id
-    dff=industryDatabag.getByName('stablishments').getActive().copy()
+    exp=industryDatabag.getDataframe('Number of Business Stablishments by Year Chart').getActiveMode()
+    dff=industryDatabag.getDataframe('Number of Business Stablishments by Year Chart').getActive().copy()
     finalFig=px.line(sum_df(dff, 'County', 'Year', 'Value'), x='Year', y='Value', color='County', color_discrete_sequence=get_colors(dff['County'].unique()))
     finalFig.update_xaxes(nticks=len(pd.unique(dff['Year'])))
     finalFig.update_xaxes( rangeslider_visible=True)
@@ -370,4 +373,4 @@ def update_data(title, countyT,yearT, countyOn, countyValue, industryOn, industr
     fig.update_xaxes(rangeslider_visible=True)
     
 
-    return finalFig, toTable.to_dict('records'), [{'name':i, 'id':i} for i in toTable.columns], fig, countyOn, disableCounty, industryOn, disableIndustry
+    return finalFig, toTable.to_dict('records'), [{'name':i, 'id':i} for i in toTable.columns], fig, countyOn, disableCounty, industryOn, disableIndustry, exp

@@ -43,7 +43,13 @@ layout=html.Div([
             value='Original',
             
         ),
-        
+        html.Label('Max Y Value:', style=LABEL),
+        dcc.Input(id='max_input_staff', type='number', min=10, max=1000, value=150),
+        html.Label('Min Y Value:', style=LABEL),
+        dcc.Input(id='min_input_staff', type='number', min=10, max=1000, value=150),
+        html.Br(),
+        html.Br(),
+        dbc.Button('Reset', id='reset-staff', outline=True, color="primary", className="me-1", value='reset', n_clicks=0)
 
 
         
@@ -55,7 +61,7 @@ layout=html.Div([
     dbc.Container([
         dbc.Row([
             dbc.Col([
-                html.H2(['Border Patrol Agent Staffing'], style=TITLE)
+                html.H2(id='staff-title',children=['Border Patrol Agent Staffing'], style=TITLE)
             ]),
             dbc.Col([
                 html.Div([
@@ -136,30 +142,81 @@ def download_median(downloadB, tab):
 
 @app.callback(
     [Output('sidebar-space-staff','hidden'),
-    Output('sidebar-title-staff', 'children')],
+    Output('sidebar-title-staff', 'children'),
+    Output('max_input_staff', 'max'),
+    Output('max_input_staff', 'min'),
+    Output('min_input_staff', 'max'),
+    Output('min_input_staff','min'),
+    Output('max_input_staff','value'),
+    Output('min_input_staff','value')],
     [Input('edit-staff', 'n_clicks'),
     Input('select-indicator','value'),
     Input('sidebar-space-staff', 'hidden'),
-    Input('chart-options-staff', 'value')]
+    Input('reset-staff','n_clicks'),
+    Input('chart-options-staff','value')]
 )
-def get_sidebar(button, graphName, hideSideBar, graphMode):
+def get_sidebar(button, graphName, hideSideBar, reset, dummyChartOptions):
     trigger_id=ctx.triggered_id
     if(trigger_id=='edit-staff'):
         if(hideSideBar):
             hideSideBar=False
         else:
             hideSideBar=True
-    title=staffDatabag.getByName(graphName).title
-    staffDatabag.getByName(graphName).activateDataframe(graphMode)
-    return hideSideBar, title
-
+    staffDatabag.getByName(graphName).activateDataframe(dummyChartOptions)
+    currentDataset=staffDatabag.getByName(graphName)
+    title=currentDataset.title
+    
+    currMin=currentDataset.min
+    currMax=currentDataset.max
+    if(currentDataset.isTrimmed()):
+        currentValueMax=currentDataset.trimMax
+        currentValueMin=currentDataset.trimMin
+        minMax=currentDataset.trimMax-1
+        maxMin=currentDataset.trimMin+1
+    else:
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        minMax=currentDataset.max-1
+        maxMin=currentDataset.min+1
+    if(trigger_id=='reset-staff'):
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        hideSideBar=False
+    if(trigger_id=='max_input_staff' or trigger_id=='min_input_staff'):
+        minMax=max-1
+        maxMin=min+1
+        currentValueMax=max
+        currentValueMin=min
+        hideSideBar=False
+    
+    return hideSideBar, title, currMax, maxMin, minMax, currMin, currentValueMax, currentValueMin
+@app.callback(
+    Output('staff-title','children'),
+    [Input('staff-title','children'),
+    Input('chart-options-staff','value'),
+    Input('sidebar-title-staff','children'),
+    Input('reset-staff','n_clicks'),
+    Input('max_input_staff','value'),
+    Input('min_input_staff','value')]
+)
+def change_chart(title, chartMode, sideBarTitle, reset, max, min):
+    trigger_id=ctx.triggered_id
+    #staffDatabag.getDataframe(sideBarTitle).activateDataframe(chartMode)
+    if(trigger_id=='max_input_staff' or trigger_id=='min_input_staff'):
+        staffDatabag.getDataframe(sideBarTitle).trim(max, min)
+    if(trigger_id=='reset-staff'):
+        staffDatabag.getDataframe(sideBarTitle).reset()
+    return title
 
 @app.callback(
     Output('staffing-graph', 'figure'),
     [Input('select-indicator','value'),
-    Input('chart-options-staff', 'value')]
+    Input('chart-options-staff', 'value'),
+    Input('max_input_staff','value'),
+    Input('min_input_staff','value'),
+    Input('reset-staff','n_clicks')]
 )
-def update_data(indicator, dummyValue):
+def update_data(indicator, dummyValue, dummyMax, dummyMin, dummyReset):
     dff=staffDatabag.getByName(indicator).getActive().copy()
     if(indicator=='region'):
         fig=px.line(dff, x='Fiscal Year', y='Staffing ', color='Border Patrol Region', color_discrete_sequence=get_colors(dff['Border Patrol Region'].unique()))

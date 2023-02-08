@@ -14,6 +14,8 @@ from plotly.subplots import make_subplots
 from apps.common_items import *
 from apps.dataset import *
 from apps.dataBag import *
+import dash_draggable
+
 
 
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
@@ -189,7 +191,7 @@ layout=html.Div(children=[
         dbc.Row([
             dbc.Col([
                 html.Div([
-                    dcc.Graph(id='hs-naics-graph', figure={})
+                    dcc.Graph(id='hs-naics-graph', figure={}, config={'editable':True, 'edits':{'legendPosition':True,'titleText':False, 'axisTitleText':False}, 'showTips':True})
                 ])
             ])
         ])
@@ -236,7 +238,8 @@ layout=html.Div(children=[
                 html.Div([
                     dcc.Graph(
                         id='ep-graph',
-                        figure={}
+                        figure={},
+                        config={'editable':False}
                     )
                 ])
             ]),
@@ -384,16 +387,17 @@ def get_sidebar(buttonimpEx, showSideBar, hsNaics, impExp, reset, max, min):
     Input('min_input','value'),
     Input('sidebar-title-trade','children'),
     Input('reset-trade','n_clicks'),
+    Input('dummy_trade','children')
     ]
-)
-def change_chart(chartMode, max, min, title, reset):
+) 
+def change_chart(chartMode, max, min, title, reset, mainTitle):
     trigger_id=ctx.triggered_id
     tradeDatabag.getDataframe(title).activateDataframe(chartMode)
     if(trigger_id=='max_input' or trigger_id=='min_input'):
         tradeDatabag.getDataframe(title).trim(max, min)
     if(trigger_id=='reset-trade'):
         tradeDatabag.getDataframe(title).reset()
-
+    return mainTitle
 
 @app.callback(
     [
@@ -438,6 +442,7 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
     importsToggle=False
     naicsDropdown=True
     trigger_id=ctx.triggered_id
+    #print("Resetting graph "+trigger_id)
     currentDataset=tradeDatabag.getDataframe(sideBarTitle)
     dff=currentDataset.getActive().copy()
     if(toggleHsNaics==True):

@@ -20,7 +20,7 @@ DATA_PATH = PATH.joinpath("../datasets/Apprehensions").resolve()
 df_cit=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Citizenship.xlsx'))
 df_cit_per=df_cit.copy()
 df_cit_per['Apprehensions']=df_cit_per['Apprehensions'].pct_change()
-citDataset=dataset('Yearly Apprehensions by Citizenship Chart', df_cit, 'Apprehensions','tab-cit', 'Citizenship', 'Apprehensions')
+citDataset=dataset('Yearly Apprehensions by Citizenship Chart', df_cit, 'Apprehensions','tab-cit', 'Citizenship', 'Apprehensions', 'Citizenship')
 citDataset.modify_percent_change('Sector', 'Citizenship', 'Apprehensions')
 
 df_country=pd.read_excel(DATA_PATH.joinpath('Apprehensions by Country.xlsx'))
@@ -70,12 +70,13 @@ layout=html.Div([
             value='Original',
             
         ),
-        
+        html.Label('Max Y Value:', style=LABEL),
+        dcc.Input(id='max_input_app', type='number', min=10, max=1000, value=150),
+        html.Label('Min Y Value:', style=LABEL),
+        dcc.Input(id='min_input_app', type='number', min=10, max=1000, value=150),
         html.Br(),
         html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br(),
+        dbc.Button('Reset', id='reset-app', outline=True, color="primary", className="me-1", value='reset', n_clicks=0),
         html.Br(),
         html.Br(),
         html.Br(),
@@ -109,7 +110,7 @@ layout=html.Div([
         dbc.Row([
             dbc.Col([
                 html.Div([
-                    html.H2(['Yearly Apprehensions by Sector'], style=TITLE)
+                    html.H2(id='app-title',children=['Yearly Apprehensions by Sector'], style=TITLE)
                 ])
             ])
         ])
@@ -388,7 +389,13 @@ def download_median(downloadB, tab):
 @app.callback(
     [Output('sidebar-space','hidden'),
     Output('dummy1','children'),
-    Output('sidebar-title','children')],
+    Output('sidebar-title','children'),
+    Output('max_input_app', 'max'),
+    Output('max_input_app', 'min'),
+    Output('min_input_app', 'max'),
+    Output('min_input_app','min'),
+    Output('max_input_app','value'),
+    Output('min_input_app','value')],
     [Input('edit-yearly','n_clicks'),
     Input('sidebar-space','children'),
     Input('app-tabs','value'),
@@ -398,12 +405,18 @@ def download_median(downloadB, tab):
     Input('edit-southwest','n_clicks'),
     Input('south-tabs','value'),
     Input('sidebar-title', 'children'),
-    Input('chart-options','value')]
+    Input('reset-app','n_clicks'),
+    Input('app-title','children'),
+    Input('select-sector','value')]
 )
-def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, sideBarShow, southButton, southTabs, title, chartType):
+def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, sideBarShow, southButton, southTabs, title, reset, dummyTitle, filterValue):
     trigger_id=ctx.triggered_id    
+    if(trigger_id=='select-sector'):
+        borderSecurityBag.getByName(currentTabApp).adjustMinMax('Sector', filterValue)
     if(trigger_id=='edit-yearly'):
-        newTitle=borderSecurityBag.getByName(currentTabApp).title
+        borderSecurityBag.getByName(currentTabApp).adjustMinMax('Sector', filterValue)
+        currentDataset=borderSecurityBag.getByName(currentTabApp)
+        newTitle=currentDataset.title
         if(sideBarShow):
             sideBarShow=False
         else:
@@ -414,7 +427,8 @@ def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, 
         
             
     if(trigger_id=='edit-monthly'):
-        newTitle=borderSecurityBag.getByName(monthlyTab).title
+        currentDataset=borderSecurityBag.getByName(monthlyTab)
+        newTitle=currentDataset.title
         if(sideBarShow):
             sideBarShow=False
         elif(title==newTitle):
@@ -423,7 +437,8 @@ def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, 
         title=newTitle
         
     if(trigger_id=='edit-southwest'):
-        newTitle=borderSecurityBag.getByName(southTabs).title
+        currentDataset=borderSecurityBag.getByName(southTabs)
+        newTitle=currentDataset.title
         if(sideBarShow):
             sideBarShow=False
         elif(title==newTitle):
@@ -431,20 +446,72 @@ def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, 
         title=newTitle
         
     if(trigger_id=='app-tabs'):
-        title=borderSecurityBag.getByName(currentTabApp).title
+        currentDataset=borderSecurityBag.getByName(currentTabApp)
+        title=currentDataset.title
     if(trigger_id=='monthly-tabs'):
-        title=borderSecurityBag.getByName(monthlyTab).title
+        currentDataset=borderSecurityBag.getByName(monthlyTab)
+        title=currentDataset.title
     if(trigger_id=='south-tabs'):
-        title=borderSecurityBag.getByName(southTabs).title
-    borderSecurityBag.getDataframe(title).activateDataframe(chartType)
+        currentDataset=borderSecurityBag.getByName(southTabs)
+        title=currentDataset.title
+    currentDataset=borderSecurityBag.getDataframe(title)
+    currMin=currentDataset.min
+    currMax=currentDataset.max
+    if(currentDataset.isTrimmed()):
+        currentValueMax=currentDataset.trimMax
+        currentValueMin=currentDataset.trimMin
+        minMax=currentDataset.trimMax-1
+        maxMin=currentDataset.trimMin+1
+    else:
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        minMax=currentDataset.max-1
+        maxMin=currentDataset.min+1
+    if(trigger_id=='reset-app'):
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        sideBarShow=False
+    if(trigger_id=='max_input_app' or trigger_id=='min_input_app'):
+        minMax=max-1
+        maxMin=min+1
+        currentValueMax=max
+        currentValueMin=min
+        sideBarShow=False
+    if(trigger_id=='reset-app'):
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        sideBarShow=False
+    if(trigger_id=='max_input_app' or trigger_id=='min_input_app'):
+        minMax=max-1
+        maxMin=min+1
+        currentValueMax=max
+        currentValueMin=min
+        sideBarShow=False
+    
         
     
     
 
          
-    return sideBarShow, title, title
+    return sideBarShow, title, title, currMax, maxMin, minMax, currMin, currentValueMax, currentValueMin
 
-
+@app.callback(
+    Output('app-title','children'),
+    [Input('app-title','children'),
+    Input('chart-options','value'),
+    Input('sidebar-title','children'),
+    Input('reset-app','n_clicks'),
+    Input('max_input_app','value'),
+    Input('min_input_app','value')]
+)
+def change_chart(title, chartMode, sideBarTitle, reset, max, min):
+    trigger_id=ctx.triggered_id
+    borderSecurityBag.getDataframe(sideBarTitle).activateDataframe(chartMode)
+    if(trigger_id=='max_input_app' or trigger_id=='min_input_app'):
+        borderSecurityBag.getDataframe(sideBarTitle).trim(max, min)
+    if(trigger_id=='reset-app'):
+        borderSecurityBag.getDataframe(sideBarTitle).reset()
+    return title
 
 @app.callback(
     [Output('apprehensions-graph', 'figure'),
@@ -469,9 +536,12 @@ def get_sidebar(button, sidebarSpace, currentTabApp, monthlyButton, monthlyTab, 
     Input('edit-yearly','value'),
     Input('edit-monthly','value'),
     Input('edit-southwest','value'),
-    Input('chart-options','value')]
+    Input('chart-options','value'),
+    Input('max_input_app','value'),
+    Input('min_input_app','value'),
+    Input('reset-app','n_clicks')]
 )
-def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptions, monthlyValue, southTab, southOptions, southValue, yearlyButton, monthlyButton, southwestButton, chartType):
+def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptions, monthlyValue, southTab, southOptions, southValue, yearlyButton, monthlyButton, southwestButton, chartType, dummyMax, dummyMin, dummyReset):
     #Chunk for section 1:
     trigger_id=ctx.triggered_id
     if(currentTab=='tab-cit'):
@@ -479,14 +549,14 @@ def update_data(sectorValue, sectorOptions, currentTab, monthlyTab, monthlyOptio
         if(trigger_id=='app-tabs'):
             sectorOptions=get_options(dff, 'Sector')
             sectorValue=dff['Sector'].unique()[0]
-        fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Apprehensions', color='Citizenship', color_discrete_sequence=get_colors(dff['Citizenship'].unique()))
+        fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Apprehensions', color='Citizenship', color_discrete_sequence=borderSecurityBag.getByName(currentTab).colors)
         fig.update_xaxes(rangeslider_visible=True)
     if(currentTab=='tab-country'):
         dff=borderSecurityBag.getByName(currentTab).getActive().copy()
         if(trigger_id=='app-tabs'):
             sectorOptions=get_options(dff, 'Sector')
             sectorValue=dff['Sector'].unique()[0]
-        fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Illegal Alien Apprehensions', color='Country', color_discrete_sequence=get_colors(dff['Country'].unique()))
+        fig=px.line(dff[dff['Sector']==sectorValue], x='Year', y='Illegal Alien Apprehensions', color='Country', color_discrete_sequence=borderSecurityBag.getByName(currentTab).colors)
         fig.update_xaxes(rangeslider_visible=True)   
     if(borderSecurityBag.getByName(currentTab).get_active_mode()=='Original'):
         nothing='nothing'

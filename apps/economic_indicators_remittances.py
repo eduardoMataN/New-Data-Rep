@@ -39,6 +39,13 @@ layout=html.Div(children=[
             value='Original',
             
         ),
+        html.Label('Max Y Value:', style=LABEL),
+        dcc.Input(id='max_input_rem', type='number', min=10, max=1000, value=150),
+        html.Label('Min Y Value:', style=LABEL),
+        dcc.Input(id='min_input_rem', type='number', min=10, max=1000, value=150),
+        html.Br(),
+        html.Br(),
+        dbc.Button('Reset', id='reset-rem', outline=True, color="primary", className="me-1", value='reset', n_clicks=0)
         
 
 
@@ -106,33 +113,91 @@ def download_median(downloadB):
  
     return dcc.send_data_frame(df_rem.to_excel, 'Revenues by Workers Remittances Data.xlsx')
 
+@app.callback(
+    Output('rem-title','children'),
+    [Input('chart-options-rem','value'),
+    Input('max_input_rem','value'),
+    Input('min_input_rem','value'),
+    Input('reset-rem','n_clicks'),
+    Input('rem-title','children')
+    ]
+)
+def change_chart(chartMode, max, min, reset, mainTitle):
+    trigger_id=ctx.triggered_id
+    if(trigger_id=='chart-options-rem'):
+        remDatabag.getDataframe().activateDataframe(chartMode)
+        remDatabag.getDataframe().reset()
+    if(trigger_id=='max_input_rem' or trigger_id=='min_input_rem'):
+        remDatabag.getDataframe().trim(max, min)
+    if(trigger_id=='reset-rem'):
+        remDatabag.getDataframe().reset()
+    return mainTitle
 
 @app.callback(
-    Output('sidebar-space-rem','hidden'),
+    [Output('sidebar-space-rem','hidden'),
+    Output('max_input_rem', 'max'),
+    Output('max_input_rem', 'min'),
+    Output('min_input_rem', 'max'),
+    Output('min_input_rem','min'),
+    Output('max_input_rem','value'),
+    Output('min_input_rem','value')],
     [Input('edit-rem', 'n_clicks'),
     Input('sidebar-space-rem', 'hidden'),
-    Input('chart-options-rem', 'value')]
+    Input('max_input_rem','value'),
+    Input('min_input_rem','value'),
+    Input('reset-rem','n_clicks'),
+    Input('rem-title','children')]
 )
-def get_sidebar(button, hideSideBar, graphMode):
+def get_sidebar(button, hideSideBar, max, min, reset, dummyTitle):
     trigger_id=ctx.triggered_id
     if(trigger_id=='edit-rem'):
         if(hideSideBar):
             hideSideBar=False
         else:
             hideSideBar=True
-    remDatabag.getDataframe().activateDataframe(graphMode)
+    currentDataset=remDatabag.getDataframe()
+    currMin=currentDataset.min
+    currMax=currentDataset.max
+    if(currentDataset.isTrimmed()):
+        currentValueMax=currentDataset.trimMax
+        currentValueMin=currentDataset.trimMin
+        minMax=currentDataset.trimMax-1
+        maxMin=currentDataset.trimMin-1
+    else:
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        minMax=currentDataset.max-1
+        maxMin=currentDataset.min+1
+    if(trigger_id=='reset-rem'):
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        hideSideBar=False
+    if(trigger_id=='max_input_rem' or trigger_id=='min_input_rem'):
+        minMax=max-1
+        maxMin=min+1
+        currentValueMax=max
+        currentValueMin=min
+        hideSideBar=False
 
     
-    return hideSideBar
+    return hideSideBar, currMax, maxMin, minMax, currMin, currentValueMax, currentValueMin
+
+
 
 @app.callback(
     Output('rem-graph', 'figure'),
     [Input('rem-title', 'children'),
-    Input('chart-options-rem', 'value')]
+    Input('chart-options-rem', 'value'),
+    Input('reset-rem','n_clicks')]
     
 )
-def update_data(title, dummyValue):
-    dff=remDatabag.getDataframe().getActive().copy()
+def update_data(title, dummyValue, reset):
+    currentDataset=remDatabag.getDataframe()
+    dff=currentDataset.getActive().copy()
+    if(currentDataset.isTrimmed()):
+        max=currentDataset.trimMax
+        min=currentDataset.trimMin
+        dff=dff[(dff['Value']>=min)&(dff['Value']<=max)]
     fig=px.line(dff, x='Year', y='Value')
     fig.update_xaxes(nticks=len(pd.unique(dff['Year'])), rangeslider_visible=True)
     if(dummyValue=='Original'):
