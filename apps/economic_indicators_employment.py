@@ -210,8 +210,7 @@ def download_median(downloadB):
     Output('min_input_emp', 'max'),
     Output('min_input_emp','min'),
     Output('max_input_emp','value'),
-    Output('min_input_emp','value'),
-    Output('test-value','children')],
+    Output('min_input_emp','value')],
     [Input('edit-emp', 'n_clicks'),
     Input('sidebar-space-emp', 'hidden'),
     Input('max_input_emp','value'),
@@ -232,9 +231,7 @@ def get_sidebar(button, hideSideBar, max, min, reset, dummyTitle, countyValue):
     currentDataset=employmentDatabag.getDataframe('Employment by Industry Chart')
     currMin=currentDataset.min
     currMax=currentDataset.max
-    returnValue='Its not trimmed'
     if(currentDataset.isTrimmed()):
-        returnValue='Its trimmed'
         currentValueMax=currentDataset.trimMax
         currentValueMin=currentDataset.trimMin
         minMax=currentDataset.trimMax-1
@@ -256,7 +253,7 @@ def get_sidebar(button, hideSideBar, max, min, reset, dummyTitle, countyValue):
         hideSideBar=False
 
     
-    return hideSideBar, currMax, maxMin, minMax, currMin, currentValueMax, currentValueMin, returnValue
+    return hideSideBar, currMax, maxMin, minMax, currMin, currentValueMax, currentValueMin
 @app.callback(
     Output('emp-title','children'),
     [Input('chart-options-emp','value'),
@@ -310,8 +307,6 @@ def update_data(empPw, countyEmp, yearEmp, monthEmp, dummyValue, dummyMax, dummy
         emp=sum(dfemp[(dfemp['County']==countyEmp) & (dfemp['Year']==yearEmp)]['Value'])
         unemp=sum(dfunemp[(dfunemp['County']==countyEmp) & (dfunemp['Year']==yearEmp)]['Unemployed'])
     dff=employmentDatabag.getDataframe('Employment by Industry Chart').getActive().copy()
-    if(employmentDatabag.getDataframe('Employment by Industry Chart').getActiveMode()=='PercentChange'):
-        dff.to_excel('TEST.xlsx')
     fig=make_subplots(1,1)
     fig=create_subplot(fig, 1, 1, filter_df(dff, 'County', countyEmp), 'Year', 'Value', 'Description')
     
