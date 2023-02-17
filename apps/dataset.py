@@ -1,5 +1,6 @@
 import pandas as pd
 from apps.common_items import *
+import numpy as np
 class dataset:
     
     def __init__(self, title, df_original, column=None, name=None, group=None, By=None, colors=None):
@@ -93,7 +94,8 @@ class dataset:
                 for element in firstFilter:
                     for filtering in secondFilter:
                         for filteringTwo in thirdFilter:
-                            dff=self.df_original[(self.df_original[filter[0]]==element) & (self.df_original[filter[1]]==filtering) & (self.df_original[filter[2]==filteringTwo])]
+                            dff=self.df_original.copy()
+                            dff=dff[(dff[filter[0]]==element) & (dff[filter[1]]==filtering) & (dff[filter[2]==filteringTwo])]
                             df=dff.copy()
                             df[by]=df.groupby(group)[by].apply(lambda x: x.div(x.iloc[0]).subtract(1).mul(100))
                             dataframes.append(df)
@@ -118,17 +120,22 @@ class dataset:
                                 df[by]=df.groupby(group)[by].apply(lambda x: x.div(x.iloc[0]).subtract(1).mul(100))
                                 dataframes.append(df)
                 df_rest=pd.concat(dataframes)
+                df_rest.replace([np.inf, -np.inf], 0, inplace=True)
+                df_rest[by].replace(r'^\s*$',0)
                 self.df_percent_change=df_rest
                 return
 
         elements=self.df_original[filter].unique()
         dataframes=[]
         for element in elements:
-            dff=self.df_original[self.df_original[filter]==element]
+            dff=self.df_original.copy()
+            dff=dff[dff[filter]==element]
             df=dff.copy()
             df[by]=df.groupby(group)[by].apply(lambda x: x.div(x.iloc[0]).subtract(1).mul(100))
             dataframes.append(df)
         df_rest=pd.concat(dataframes)
+        df_rest.replace([np.inf, -np.inf], 0, inplace=True)
+        df_rest[by].replace(r'^\s*$',0)
         self.df_percent_change=df_rest
     def trim(self, max, min):
         if(max==self.max and min==self.min):
@@ -150,7 +157,7 @@ class dataset:
     def getActiveMode(self):
         return self.active_mode
     def adjustMinMax(self, column, value):
-        df=self.df_active
+        df=self.df_active.copy()
         df=df[df[column]==value]
         dff=df.copy()
         self.min=dff[self.valuePoint].min()

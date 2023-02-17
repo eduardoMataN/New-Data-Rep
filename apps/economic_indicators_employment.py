@@ -45,7 +45,13 @@ layout=html.Div(children=[
             value='Original',
             
         ),
-        
+        html.Label('Max Y Value:', style=LABEL),
+        dcc.Input(id='max_input_emp', type='number', min=10, max=1000, value=150),
+        html.Label('Min Y Value:', style=LABEL),
+        dcc.Input(id='min_input_emp', type='number', min=10, max=1000, value=150),
+        html.Br(),
+        html.Br(),
+        dbc.Button('Reset', id='reset-emp', outline=True, color="primary", className="me-1", value='reset', n_clicks=0)
 
 
         
@@ -57,7 +63,7 @@ layout=html.Div(children=[
         dbc.Row([
             dbc.Col([
                 html.Div([
-                    html.H2(['Employment by Industry'], style=TITLE)
+                    html.H2(id='emp-title',children=['Employment by Industry'], style=TITLE)
                 ])
             ])
         ])
@@ -81,7 +87,8 @@ layout=html.Div(children=[
                             id='emp-monthly-pw',
                             on=False,
                             label='Monthly Data',
-                            style=LABEL
+                            style=LABEL,
+                            color=orange
                         )
                 ])
             ], width=2),
@@ -101,7 +108,7 @@ layout=html.Div(children=[
         dbc.Row([
             dbc.Col([
                 html.Div([
-                        html.Label(['County'], style={'font-weight':'bold', 'color':'#041E42'}),
+                        html.Label(id='test-value',children=['County'], style={'font-weight':'bold', 'color':'#041E42'}),
                         dcc.Dropdown(
                             id='emp-county-select',
                             options=[{'label':x, 'value':x} for x in df_total['County'].unique()],
@@ -165,7 +172,7 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Units: Individuals', style={'color':blue, 'font-weight':'bold'})
                     ], width=3),
                     dbc.Col([
                         html.P('Last Update: March 2020', style={'color':blue, 'font-weight':'bold'})
@@ -197,22 +204,78 @@ def download_median(downloadB):
     return dcc.send_data_frame(universal_df.to_excel, 'Employment Data.xlsx') 
 
 @app.callback(
-    Output('sidebar-space-emp','hidden'),
+    [Output('sidebar-space-emp','hidden'),
+    Output('max_input_emp', 'max'),
+    Output('max_input_emp', 'min'),
+    Output('min_input_emp', 'max'),
+    Output('min_input_emp','min'),
+    Output('max_input_emp','value'),
+    Output('min_input_emp','value'),
+    Output('test-value','children')],
     [Input('edit-emp', 'n_clicks'),
     Input('sidebar-space-emp', 'hidden'),
-    Input('chart-options-emp', 'value')]
+    Input('max_input_emp','value'),
+    Input('min_input_emp','value'),
+    Input('reset-emp','n_clicks'),
+    Input('emp-title','children'),
+    Input('emp-county-select','value')]
 )
-def get_sidebar(button, hideSideBar, graphMode):
+def get_sidebar(button, hideSideBar, max, min, reset, dummyTitle, countyValue):
     trigger_id=ctx.triggered_id
+    print(trigger_id)
     if(trigger_id=='edit-emp'):
         if(hideSideBar):
             hideSideBar=False
         else:
             hideSideBar=True
-    employmentDatabag.getDataframe().activateDataframe(graphMode)
+    employmentDatabag.getDataframe('Employment by Industry Chart').adjustMinMax('County', countyValue)
+    currentDataset=employmentDatabag.getDataframe('Employment by Industry Chart')
+    currMin=currentDataset.min
+    currMax=currentDataset.max
+    returnValue='Its not trimmed'
+    if(currentDataset.isTrimmed()):
+        returnValue='Its trimmed'
+        currentValueMax=currentDataset.trimMax
+        currentValueMin=currentDataset.trimMin
+        minMax=currentDataset.trimMax-1
+        maxMin=currentDataset.trimMin-1
+    else:
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        minMax=currentDataset.max-1
+        maxMin=currentDataset.min+1
+    if(trigger_id=='reset-emp'):
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        hideSideBar=False
+    if(trigger_id=='max_input_emp' or trigger_id=='min_input_emp'):
+        minMax=max-1
+        maxMin=min+1
+        currentValueMax=max
+        currentValueMin=min
+        hideSideBar=False
 
     
-    return hideSideBar
+    return hideSideBar, currMax, maxMin, minMax, currMin, currentValueMax, currentValueMin, returnValue
+@app.callback(
+    Output('emp-title','children'),
+    [Input('chart-options-emp','value'),
+    Input('max_input_emp','value'),
+    Input('min_input_emp','value'),
+    Input('reset-emp','n_clicks'),
+    Input('emp-title','children')
+    ]
+)
+def change_chart(chartMode, max, min, reset, mainTitle):
+    trigger_id=ctx.triggered_id
+    if(trigger_id=='chart-options-emp'):
+        employmentDatabag.getDataframe('Employment by Industry Chart').activateDataframe(chartMode)
+        employmentDatabag.getDataframe('Employment by Industry Chart').reset()
+    if(trigger_id=='max_input_emp' or trigger_id=='min_input_emp'):
+        employmentDatabag.getDataframe('Employment by Industry Chart').trim(max, min)
+    if(trigger_id=='reset-emp'):
+        employmentDatabag.getDataframe('Employment by Industry Chart').reset()
+    return mainTitle
 
 @app.callback(
     [
@@ -225,10 +288,13 @@ def get_sidebar(button, hideSideBar, graphMode):
         Input(component_id='emp-county-select', component_property='value'),
         Input(component_id='emp-year-select', component_property='value'),
         Input(component_id='emp-month-select', component_property='value'),
-        Input('chart-options-emp','value')
+        Input('chart-options-emp','value'),
+        Input('max_input_emp', 'value'),
+        Input('min_input_emp','value'),
+        Input('reset-emp','value')
     ]
 )
-def update_data(empPw, countyEmp, yearEmp, monthEmp, dummyValue):
+def update_data(empPw, countyEmp, yearEmp, monthEmp, dummyValue, dummyMax, dummyMin, reset):
     emp=0
     unemp=0
     dfemp=df_total.copy()
@@ -243,7 +309,9 @@ def update_data(empPw, countyEmp, yearEmp, monthEmp, dummyValue):
         monthSE=True
         emp=sum(dfemp[(dfemp['County']==countyEmp) & (dfemp['Year']==yearEmp)]['Value'])
         unemp=sum(dfunemp[(dfunemp['County']==countyEmp) & (dfunemp['Year']==yearEmp)]['Unemployed'])
-    dff=employmentDatabag.getDataframe().getActive().copy()
+    dff=employmentDatabag.getDataframe('Employment by Industry Chart').getActive().copy()
+    if(employmentDatabag.getDataframe('Employment by Industry Chart').getActiveMode()=='PercentChange'):
+        dff.to_excel('TEST.xlsx')
     fig=make_subplots(1,1)
     fig=create_subplot(fig, 1, 1, filter_df(dff, 'County', countyEmp), 'Year', 'Value', 'Description')
     
