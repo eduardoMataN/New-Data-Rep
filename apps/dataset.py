@@ -30,7 +30,9 @@ class dataset:
             self.colors=None
     def get_original(self):
         return self.df_original
-
+    def get_options(self,column):
+        dff=self.df_original.copy()
+        return [{'label':x,'value':x}for x in dff[column].unique()], dff[column].unique()[0]
     def activateDataframe(self, mode):
         if(mode=='Original'):
             self.df_active=self.df_original
@@ -157,6 +159,18 @@ class dataset:
     def getActiveMode(self):
         return self.active_mode
     def adjustMinMax(self, column, value):
+        if(type(column) is list and type(value) is list):
+            if(len(column)==len(value)):
+                df=self.df_active.copy()
+                for i in range(0, len(column)):
+                    df=df[df[column[i]]==value[i]]
+                dff=df.copy()
+                
+                self.min=dff[self.valuePoint].min()
+                self.max=dff[self.valuePoint].max()
+                return 
+            else:
+                return None
         df=self.df_active.copy()
         df=df[df[column]==value]
         dff=df.copy()

@@ -59,9 +59,9 @@ CONTENT_STYLE = {
 }
 
 layout=html.Div(children=[
-    html.Div(id='sidebar-space-income',children=[
-        html.Div(
-    [
+    dbc.Offcanvas(id='sidebar-space-income',children=[
+        
+    
         html.H6(id='sidebar-title-income',children='Border Patrol Agent Staffing'),
         html.Hr(),
         html.P(
@@ -80,10 +80,9 @@ layout=html.Div(children=[
 
 
         
-    ],
-    style=SIDEBAR_STYLE,
-    )
-    ], hidden=True),
+    
+    
+    ], is_open=False),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col(
@@ -359,7 +358,7 @@ def download_median(downloadB):
     return dcc.send_data_frame(df_median.to_excel, 'Median Household & Personal Income.xlsx')
 
 @app.callback(
-    [Output('sidebar-space-income','hidden'),
+    [Output('sidebar-space-income','is_open'),
     Output('sidebar-title-income', 'children'),],
     [Input('edit-income', 'n_clicks'),
     Input('select-indicator','value'),

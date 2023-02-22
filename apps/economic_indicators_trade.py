@@ -51,9 +51,8 @@ CONTENT_STYLE = {
 }
 
 layout=html.Div(children=[
-    html.Div(id='sidebar-space-trade',children=[
-        html.Div(
-    [
+    dbc.Offcanvas(id='sidebar-space-trade',backdrop=False,children=[
+        
         html.H6(id='sidebar-title-trade',children='Imports by HS Commodities Imports Chart'),
         html.Hr(),
         html.P(
@@ -69,8 +68,11 @@ layout=html.Div(children=[
             
         ),
         html.Label('Max Y Value:', style=LABEL),
+        html.Br(),
         dcc.Input(id='max_input', type='number', min=10, max=1000, value=150),
+        html.Br(),
         html.Label('Min Y Value:', style=LABEL),
+        html.Br(),
         dcc.Input(id='min_input', type='number', min=10, max=1000, value=150),
         html.Br(),
         html.Br(),
@@ -80,10 +82,8 @@ layout=html.Div(children=[
 
 
         
-    ],
-    style=SIDEBAR_STYLE,
-    )
-    ], hidden=True),
+    
+    ], is_open=False, title='Chart Modifier'),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([
@@ -317,37 +317,49 @@ def download_median(downloadB):
 
 @app.callback(
     
-    [Output('sidebar-space-trade', 'hidden'),
+    [Output('sidebar-space-trade', 'is_open'),
     Output('sidebar-title-trade', 'children'),
     Output('max_input', 'max'),
     Output('max_input', 'min'),
     Output('min_input', 'max'),
     Output('min_input','min'),
     Output('max_input','value'),
-    Output('min_input','value')],
+    Output('min_input','value'),
+    Output('select-measures-int','options'),
+    Output('select-measures-int','value'),
+    Output('select-comm-int','options'),
+    Output('select-comm-int','value'),],
     [Input('edit-trade-impex', 'n_clicks'),
     Input('sidebar-space-trade', 'hidden'),
     Input('toggle-int-2', 'value'),
     Input('toggle-int','value'),
     Input('reset-trade','n_clicks'),
     Input('max_input','value'),
-    Input('min_input','value')]
+    Input('min_input','value'),
+    Input('select-measures-int','value'),
+    Input('select-comm-int','value'),
+    Input('select-measures-int','options'),
+    Input('select-comm-int','options')]
 )
-def get_sidebar(buttonimpEx, showSideBar, hsNaics, impExp, reset, max, min):
+def get_sidebar(buttonimpEx, showSideBar, hsNaics, impExp, reset, max, min, measureValue, commValue, measuresOp, commOp):
     trigger_id=ctx.triggered_id
     name='hsImports'
-    if(buttonimpEx):
+    if(trigger_id=='edit-trade-impex'):
         if(showSideBar):
             showSideBar=False
         else:
             showSideBar=True
-        if(hsNaics):
-            name='naics'
+    if(hsNaics==True):
+        name='naics'
+    else:
+        if(impExp==True):
+            name='hsExports'
         else:
-            if(impExp):
-                name='hsExports'
-            else:
-                name='hsImports'
+            name='hsImports'
+    if(trigger_id=='toggle-int' or trigger_id=='toggle-int-2'):
+        measuresOp, measureValue=tradeDatabag.getByName(name).get_options('Measures')
+        commOp, commValue=tradeDatabag.getByName(name).get_options('Commodity')
+    tradeDatabag.getByName(name).adjustMinMax(['Measures','Commodity'], [measureValue, commValue])
     currentDataset=tradeDatabag.getByName(name)
     currMin=currentDataset.min
     currMax=currentDataset.max
@@ -357,7 +369,6 @@ def get_sidebar(buttonimpEx, showSideBar, hsNaics, impExp, reset, max, min):
         currentValueMin=currentDataset.trimMin
         minMax=currentDataset.trimMax-1
         maxMin=currentDataset.trimMin-1
-
     else:
         currentValueMax=currentDataset.max
         currentValueMin=currentDataset.min
@@ -366,20 +377,15 @@ def get_sidebar(buttonimpEx, showSideBar, hsNaics, impExp, reset, max, min):
     if(trigger_id=='reset-trade'):
         currentValueMax=currentDataset.max
         currentValueMin=currentDataset.min
-        showSideBar=False
+        showSideBar=True
     if(trigger_id=='max_input' or trigger_id=='min_input'):
         minMax=max-1
         maxMin=min+1
         currentValueMax=max
         currentValueMin=min
-        showSideBar=False
+        showSideBar=True
     
-
-
-
-
-    
-    return showSideBar, title, currMax, maxMin, minMax, currMin, currentValueMax, currentValueMin
+    return showSideBar, title, currMax, maxMin, minMax, currMin, currentValueMax, currentValueMin, measuresOp, measureValue, commOp, commValue
 @app.callback(
     Output('dummy_trade','children'),
     [Input('chart-options-trade','value'),
@@ -405,10 +411,6 @@ def change_chart(chartMode, max, min, title, reset, mainTitle):
         Output('compare-port1','disabled'),
         Output('compare-port2', 'disabled'),
         Output('toggle-int','disabled'),
-        Output('select-measures-int','options'),
-        Output('select-measures-int','value'),
-        Output('select-comm-int','options'),
-        Output('select-comm-int','value'),
         Output('compare-port1','options'),
         Output('compare-port1','value'),
         Output('compare-port2','options'),
@@ -446,10 +448,6 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
     currentDataset=tradeDatabag.getDataframe(sideBarTitle)
     dff=currentDataset.getActive().copy()
     if(toggleHsNaics==True):
-        if(currentDataset.isTrimmed()):
-            max=currentDataset.trimMax
-            min=currentDataset.trimMin
-            dff=dff[(dff['Value']>=min)&(dff['Value']<=max)]
         naicsDropdown=False
         importsToggle=True
         if(trigger_id=='toggle-int-2'):
@@ -476,13 +474,7 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
             fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Value', color='District', color_discrete_sequence=get_colors(dff['District'].unique()))
             
     else:
-        if(currentDataset.isTrimmed()):
-            max=currentDataset.trimMax
-            min=currentDataset.trimMin
-            if(toggleImEx):
-                dff=dff[(dff['Exports']>=min)&(dff['Exports']<=max)]
-            else:
-                dff=dff[(dff['Imports']>=min)&(dff['Imports']<=max)]
+        
         if(trigger_id=='toggle-int-2'):
             measureOptions=[{'label':x,'value':x}for x in dff['Measures'].unique()]
             measureValue=dff['Measures'].unique()[0]
@@ -519,4 +511,4 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
     total_f=round(sum(dff_ep[dff_ep['Mode']==mode]['Total']),1)
     fig2.update_xaxes(tick0=1, dtick=1)
     fig2.update_xaxes(rangeslider_visible=True)
-    return fig, comparePort1, comparePort2, importsToggle, measureOptions, measureValue, commodityOptions, commodityValue, portOptions1, portValue1, portOptions2, portValue2, fig2, total_f
+    return fig, comparePort1, comparePort2, importsToggle, portOptions1, portValue1, portOptions2, portValue2, fig2, total_f
