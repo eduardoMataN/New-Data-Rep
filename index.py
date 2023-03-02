@@ -76,7 +76,13 @@ app.layout=html.Div(children=[dcc.Location(id='url', refresh=False),
     dbc.DropdownMenu(
         [
             dbc.DropdownMenuItem('Border Crossings', href='/apps/transportation_border_crossings'),
-            dbc.DropdownMenuItem('Airport Activity', href='/apps/transportation_airport_activity')
+            dbc.DropdownMenuItem('Airport Activity', href='/apps/transportation_airport_activity'),
+            dbc.DropdownMenu([
+                dbc.DropdownMenuItem('Some thing')
+            ], label='Subsection',
+            
+            color='#FFFFFF')
+            
         ],
         label='Transportation',
         toggle_style={

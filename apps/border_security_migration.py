@@ -50,12 +50,14 @@ layout=html.Div([
     )
     ], hidden=True),
     dbc.Container([
+    html.Br(),
         dbc.Row([
             dbc.Col([
                 html.Div([
                     html.H2(['Migration Indicators'], style=TITLE)
                 ])
-            ])
+            ]),
+            html.Hr(style=HR)
         ])
     ]),
     dbc.Container([
@@ -86,6 +88,8 @@ layout=html.Div([
             ], width=2),
             dbc.Col([
                 html.Div([
+                    ALIGN_LABEL,
+                    html.Br(),
                     dbc.Button('Edit Graph', id='edit-migration', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
             ], width=2)
@@ -109,13 +113,13 @@ layout=html.Div([
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        html.P(' Units: Dollars in Thousands ($)', style={'color':blue, 'font-weight':'bold'})
+                        html.P(' Units: Dollars in Thousands ($)', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Last Update: 2018', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Last Update: 2018', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Source: USA Gov', style={'color':blue})
                     ], width=3),
                     dbc.Col([
                     html.Div([

@@ -60,10 +60,15 @@ OPTION_BUTTONS=dbc.RadioItems(
         )
 blue='#041E42'
 orange='#FF8200'
+white='#FFFFFF'
+black='#000000'
+INFO_BOX_STYLE={'color':blue}
 LABEL={'font-weight':'bold', 'color':'#041E42'}
 TITLE={'color':'#041E42'}
 DROPDOWN={'width':'100%'}
-
+ALIGN_LABEL=html.Label(['Edit'], style={'color':'#ffffff'})
+HR={'color':blue, 'borderWidth': "0.3vh", 'borderColor':blue, 'opacity':'unset', 'width':'100%'}
+TILE_HR=html.Hr(style={'color':blue, 'borderWidth': "0.3vh", 'borderColor':blue, 'opacity':'unset', 'width':'100%'})
 
 tab_style = {
     'borderBottom': '1px solid #d6d6d6',

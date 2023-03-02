@@ -85,12 +85,14 @@ layout=html.Div(children=[
     
     ], is_open=False, title='Chart Modifier'),
     dbc.Container(children=[
+    html.Br(),
         dbc.Row([
             dbc.Col([
                 html.Div([
                     html.H2(id='dummy_trade',children=['Imports & Exports by HS/NAICS Commodities'], style=TITLE)
                 ])
-            ])
+            ]),
+            html.Hr(style=HR)
         ]),
         dbc.Row([
             dbc.Col([
@@ -103,7 +105,8 @@ layout=html.Div(children=[
                         value=df_trade_hs['Measures'].unique()[0],
                         style=DROPDOWN,
                         optionHeight=90,
-                        disabled=False
+                        disabled=False,
+                        searchable=True
                     )
                 ])
             ]),
@@ -116,7 +119,8 @@ layout=html.Div(children=[
                         value=df_trade_hs['Commodity'].unique()[0],
                         style=DROPDOWN,
                         optionHeight=90,
-                        disabled=False
+                        disabled=False,
+                        searchable=True
                     )
                 ])
             ]),
@@ -125,7 +129,7 @@ layout=html.Div(children=[
                     daq.ToggleSwitch(
                         id='toggle-int',
                         label='Imports/Exports',
-                        labelPosition='bottom',
+                        labelPosition='top',
                         value=False,
                         style=LABEL,
                         disabled=False
@@ -137,7 +141,7 @@ layout=html.Div(children=[
                     daq.ToggleSwitch(
                         id='toggle-int-2',
                         label='HS/NAICS',
-                        labelPosition='bottom',
+                        labelPosition='top',
                         value=False,
                         style=LABEL
                     )
@@ -145,6 +149,8 @@ layout=html.Div(children=[
             ], width=1),
             dbc.Col([
                 html.Div([
+                    ALIGN_LABEL,
+                    html.Br(),
                     dcc.Dropdown(
                         id='compare-port1',
                         options=[{'label':x, 'value':x}for x in df_trade_hs['Port'].unique()],
@@ -163,12 +169,14 @@ layout=html.Div(children=[
                         color='#FF5E5E',
                         label='Compare',
                         style=LABEL,
-                        labelPosition='bottom'
+                        labelPosition='top'
                     )
                 ])
             ], width=1),
             dbc.Col([
                 html.Div([
+                    ALIGN_LABEL,
+                    html.Br(),
                     dcc.Dropdown(
                         id='compare-port2',
                         options=[{'label':x,'value':x}for x in df_trade_hs['Port'].unique()],
@@ -181,7 +189,8 @@ layout=html.Div(children=[
             ]),
             dbc.Col([
                 html.Div([
-                    
+                    ALIGN_LABEL,
+                    html.Br(),
                     dbc.Button('Edit Graph', id='edit-trade-impex', outline=True, color="primary", className="me-1", value='edit')
                 ])
             ], width=2)
@@ -202,13 +211,13 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        html.P(' Units: Dollars in Millions ($)', style={'color':blue, 'font-weight':'bold'})
+                        html.P(' Units: Dollars in Millions ($)', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Last Update: 2022', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Last Update: 2022', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Source: USA Gov', style={'color':blue})
                     ], width=3),
                     dbc.Col([
                     html.Div([
@@ -229,7 +238,8 @@ layout=html.Div(children=[
                 html.Div([
                     html.H2(['Total Flows to El Paso'], style=TITLE)
                 ])
-            ])
+            ]),
+            html.Hr(style=HR)
         ])
     ]),
     dbc.Container(children=[
@@ -245,14 +255,26 @@ layout=html.Div(children=[
             ]),
             dbc.Col([
                 html.Div([
-                    html.Label(['Mode'], style=LABEL),
-                    dcc.Dropdown(
-                        id='select-mode-int',
-                        options=[{'label':x, 'value':x}for x in df_ep['Mode'].unique()],
-                        value=df_ep['Mode'].unique()[0],
-                        style=DROPDOWN,
-                        optionHeight=90
-                    ),
+                    dbc.Row([
+                        dbc.Col([
+                            html.Label(['Mode'], style=LABEL),
+                            dcc.Dropdown(
+                                id='select-mode-int',
+                                options=[{'label':x, 'value':x}for x in df_ep['Mode'].unique()],
+                                value=df_ep['Mode'].unique()[0],
+                                style=DROPDOWN,
+                                optionHeight=90,
+                                
+                            ),
+                        ]),
+                        dbc.Col([
+                            html.Div([
+                                html.Label(['Edit'], style={'color':'#ffffff'}),
+                                html.Br(),
+                                dbc.Button('Edit Graph', id='edit-trade-flows', outline=True, color="primary", className="me-1", value='edit')
+                            ])
+                        ])
+                        ]),
                     html.Br(),
                     daq.LEDDisplay(
                         id='led-ep',
@@ -264,7 +286,10 @@ layout=html.Div(children=[
                     )
                 
             
-                ])
+                ]),
+                html.Br(),
+                html.Br(),
+                html.Br()
             ], width=4)
         ])
     ]),
@@ -274,13 +299,13 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        html.P(' Units: Dollars in Thousands ($)', style={'color':blue, 'font-weight':'bold'})
+                        html.P(' Units: Dollars in Thousands ($)', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Last Update: 2020', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Last Update: 2020', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Source: USA Gov', style={'color':blue})
                     ], width=3),
                     dbc.Col([
                     html.Div([
@@ -328,7 +353,7 @@ def download_median(downloadB):
     Output('select-measures-int','options'),
     Output('select-measures-int','value'),
     Output('select-comm-int','options'),
-    Output('select-comm-int','value'),],
+    Output('select-comm-int','value')],
     [Input('edit-trade-impex', 'n_clicks'),
     Input('sidebar-space-trade', 'hidden'),
     Input('toggle-int-2', 'value'),
@@ -339,31 +364,53 @@ def download_median(downloadB):
     Input('select-measures-int','value'),
     Input('select-comm-int','value'),
     Input('select-measures-int','options'),
-    Input('select-comm-int','options')]
+    Input('select-comm-int','options'),
+    Input('edit-trade-flows','n_clicks'),
+    Input('select-mode-int','value'),
+    Input('sidebar-title-trade','children')]
 )
-def get_sidebar(buttonimpEx, showSideBar, hsNaics, impExp, reset, max, min, measureValue, commValue, measuresOp, commOp):
+def get_sidebar(buttonimpEx, showSideBar, hsNaics, impExp, reset, max, min, measureValue, commValue, measuresOp, commOp, buttonFlows, modeValue, title):
     trigger_id=ctx.triggered_id
     name='hsImports'
+    #Might need to use the Title as input to fix the cut functions being applied to the wrong graph. 
+    if(trigger_id=='edit-trade-flows'):
+        name='totalFlows'
+        if(showSideBar):
+            showSideBar=False
+        else:
+            showSideBar=True
+        title=tradeDatabag.getByName(name).title
     if(trigger_id=='edit-trade-impex'):
         if(showSideBar):
             showSideBar=False
         else:
             showSideBar=True
-    if(hsNaics==True):
-        name='naics'
-    else:
-        if(impExp==True):
-            name='hsExports'
+        if(hsNaics==True):
+            name='naics'
         else:
-            name='hsImports'
+            if(impExp==True):
+                name='hsExports'
+            else:
+                name='hsImports'
+        title=tradeDatabag.getByName(name).title
     if(trigger_id=='toggle-int' or trigger_id=='toggle-int-2'):
-        measuresOp, measureValue=tradeDatabag.getByName(name).get_options('Measures')
-        commOp, commValue=tradeDatabag.getByName(name).get_options('Commodity')
-    tradeDatabag.getByName(name).adjustMinMax(['Measures','Commodity'], [measureValue, commValue])
-    currentDataset=tradeDatabag.getByName(name)
+        if(hsNaics==True):
+            name='naics'
+        else:
+            if(impExp==True):
+                name='hsExports'
+            else:
+                name='hsImports'
+        title=tradeDatabag.getByName(name).title
+        measuresOp, measureValue=tradeDatabag.getDataframe(title).get_options('Measures')
+        commOp, commValue=tradeDatabag.getDataframe(title).get_options('Commodity')
+    if(title=='Total Flows to El Paso Chart'):
+        tradeDatabag.getDataframe(title).adjustMinMax('Mode', modeValue)
+    else:
+        tradeDatabag.getDataframe(title).adjustMinMax(['Measures','Commodity'], [measureValue, commValue])
+    currentDataset=tradeDatabag.getDataframe(title)
     currMin=currentDataset.min
     currMax=currentDataset.max
-    title=currentDataset.title
     if(currentDataset.isTrimmed()):
         currentValueMax=currentDataset.trimMax
         currentValueMin=currentDataset.trimMin
@@ -445,9 +492,10 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
     naicsDropdown=True
     trigger_id=ctx.triggered_id
     #print("Resetting graph "+trigger_id)
-    currentDataset=tradeDatabag.getDataframe(sideBarTitle)
-    dff=currentDataset.getActive().copy()
+    
     if(toggleHsNaics==True):
+        currentDataset=tradeDatabag.getByName('naics')
+        dff=currentDataset.getActive().copy()
         naicsDropdown=False
         importsToggle=True
         if(trigger_id=='toggle-int-2'):
@@ -474,8 +522,14 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
             fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Value', color='District', color_discrete_sequence=get_colors(dff['District'].unique()))
             
     else:
-        
+        if(toggleImEx):
+            currentDataset=tradeDatabag.getByName('hsExports')
+            dff=currentDataset.getActive().copy()
+        else:
+            currentDataset=tradeDatabag.getByName('hsImports')
+            dff=currentDataset.getActive().copy()
         if(trigger_id=='toggle-int-2'):
+            
             measureOptions=[{'label':x,'value':x}for x in dff['Measures'].unique()]
             measureValue=dff['Measures'].unique()[0]
             commodityOptions=[{'label':x,'value':x}for x in dff['Commodity'].unique()]
@@ -500,15 +554,17 @@ def update_data(measureValue, commodityValue, measureOptions, compareOn, toggleI
                 fig.update_xaxes(rangeslider= {'visible':True}, row=1, col=2)
         else:
             if(toggleImEx):
+                currentDataset=tradeDatabag.getByName('hsExports')
+                dff=currentDataset.getActive().copy()
                 fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Exports', color='Port', color_discrete_sequence=get_colors(dff['Port'].unique()))
                 fig.update_xaxes(rangeslider_visible=True)
             else:
+                currentDataset=tradeDatabag.getByName('hsImports')
+                dff=currentDataset.getActive().copy()
                 fig=px.line(dff[(dff['Measures']==measureValue)&(dff['Commodity']==commodityValue)], x='Year', y='Imports', color='Port', color_discrete_sequence=get_colors(dff['Port'].unique()))
                 fig.update_xaxes(rangeslider_visible=True)
     #Chunk to Update Second Section:
-    dff_ep=df_ep.copy()
-    fig2=px.line(dff_ep[dff_ep['Mode']==mode], x='Year', y="Total", color='Commodity', color_discrete_sequence=get_colors(dff['Commodity'].unique()))
+    dff_ep=tradeDatabag.getByName('totalFlows').getActive().copy()
     total_f=round(sum(dff_ep[dff_ep['Mode']==mode]['Total']),1)
-    fig2.update_xaxes(tick0=1, dtick=1)
-    fig2.update_xaxes(rangeslider_visible=True)
+    fig2=tradeDatabag.getByName('totalFlows').get_line_chart('Mode', mode, colors='Commodity',tick=1,dt=1)
     return fig, comparePort1, comparePort2, importsToggle, portOptions1, portValue1, portOptions2, portValue2, fig2, total_f

@@ -1,14 +1,22 @@
 import pandas as pd
 from apps.common_items import *
 import numpy as np
+import plotly.express as px
 class dataset:
     
-    def __init__(self, title, df_original, column=None, name=None, group=None, By=None, colors=None):
+    def __init__(self, title:str, df_original:pd.DataFrame, column=None, name=None, group=None, By=None, colors=None, groupMax=False, groupValue=None):
         self.df_original=df_original
         self.title=title
+        self.groupMax=groupMax
+        self.groupValue=groupValue
         if(column!=None):
-            self.max=df_original[column].max()
-            self.min=df_original[column].min()
+            if(groupMax):
+                #df_original.groupby(groupValue)
+                self.max=df_original.groupby(groupValue).sum(numeric_only=True)[column].max()
+                self.min=df_original.groupby(groupValue).sum(numeric_only=True)[column].min()
+            else:
+                self.max=df_original[column].max()
+                self.min=df_original[column].min()
             self.valuePoint=column
         if(column==None):
             self.df_percent_change=None
@@ -28,7 +36,7 @@ class dataset:
             self.colors=get_colors(df_original[colors].unique())
         else:
             self.colors=None
-    def get_original(self):
+    def get_original(self)->pd.DataFrame:
         return self.df_original
     def get_options(self,column):
         dff=self.df_original.copy()
@@ -42,8 +50,13 @@ class dataset:
             self.trimMax=None
             self.trimMin=None
             if(self.valuePoint!=None):
-                self.min=self.df_original[self.valuePoint].min()
-                self.max=self.df_original[self.valuePoint].max()
+                if(self.groupMax):
+                #df_original.groupby(groupValue)
+                    self.max=self.df_original.groupby(self.groupValue).sum(numeric_only=True)[self.valuePoint].max()
+                    self.min=self.df_original.groupby(self.groupValue).sum(numeric_only=True)[self.valuePoint].min()
+                else:
+                    self.min=self.df_original[self.valuePoint].min()
+                    self.max=self.df_original[self.valuePoint].max()
         if(mode=='PercentChange'):
             self.df_active=self.df_percent_change
             self.active_mode='PercentChange'
@@ -52,14 +65,22 @@ class dataset:
             self.trimMax=None
             self.trimMin=None
             if(self.valuePoint!=None):
-                self.min=self.df_percent_change[self.valuePoint].min()
-                self.max=self.df_percent_change[self.valuePoint].max()
+                if(self.groupMax):
+                #df_original.groupby(groupValue)
+                    self.max=self.df_original.groupby(self.groupValue).sum(numeric_only=True)[self.valuePoint].max()
+                    self.min=self.df_original.groupby(self.groupValue).sum(numeric_only=True)[self.valuePoint].min()
+                else:
+                    self.min=self.df_original[self.valuePoint].min()
+                    self.max=self.df_original[self.valuePoint].max()
         
-    def getActive(self):
+    def getActive(self)->pd.DataFrame:
+        df=self.df_active.copy()
+        if(self.groupMax):
+            df.groupby(self.groupValue)
         if(self.isTrimmed()):
-            return self.df_active[(self.df_active[self.valuePoint]>=self.trimMin)&(self.df_active[self.valuePoint]<=self.trimMax)]
-        return self.df_active
-    def get_percent_change(self, df, column, group, By):
+            return df[(df[self.valuePoint]>=self.trimMin)&(df[self.valuePoint]<=self.trimMax)]
+        return df
+    def get_percent_change(self, df, column, group, By)->pd.DataFrame:
         dff=df.copy()
         dff[column]=df[column].astype(float)
         dff[column]=df.groupby(group)[By].apply(lambda x: x.div(x.iloc[0]).subtract(1).mul(100))
@@ -70,7 +91,7 @@ class dataset:
         dff[column].pct_change()
         result=dff.copy()
         return result
-    def get_active_mode(self):
+    def get_active_mode(self)->str:
         return self.active_mode
     def modify_percent_change(self, filter, group, by):
         #Filter will be a column. For every element in that column, we'll do the percent change thing. So we have to filter one by one. 
@@ -146,17 +167,17 @@ class dataset:
         self.trimMax=max
         self.trimMin=min
         self.trimmed=True
-    def isTrimmed(self):
+    def isTrimmed(self)->bool:
         return self.trimmed
     def reset(self):
         self.trimMax=None
         self.trimMin=None
         self.trimmed=False
-    def getMin(self):
+    def getMin(self)->int:
         return self.min
-    def getMax(self):
+    def getMax(self)->int:
         return self.max
-    def getActiveMode(self):
+    def getActiveMode(self)->str:
         return self.active_mode
     def adjustMinMax(self, column, value):
         if(type(column) is list and type(value) is list):
@@ -165,17 +186,24 @@ class dataset:
                 for i in range(0, len(column)):
                     df=df[df[column[i]]==value[i]]
                 dff=df.copy()
-                
-                self.min=dff[self.valuePoint].min()
-                self.max=dff[self.valuePoint].max()
+                if(self.groupMax):
+                    self.max=dff.groupby(self.groupValue).sum(numeric_only=True)[self.valuePoint].max()
+                    self.min=dff.groupby(self.groupValue).sum(numeric_only=True)[self.valuePoint].min()
+                else:    
+                    self.min=dff[self.valuePoint].min()
+                    self.max=dff[self.valuePoint].max()
                 return 
             else:
                 return None
         df=self.df_active.copy()
         df=df[df[column]==value]
         dff=df.copy()
-        self.min=dff[self.valuePoint].min()
-        self.max=dff[self.valuePoint].max()
+        if(self.groupMax):
+            self.max=dff.groupby(self.groupValue).sum(numeric_only=True)[self.valuePoint].max()
+            self.min=dff.groupby(self.groupValue).sum(numeric_only=True)[self.valuePoint].min()
+        else:
+            self.min=dff[self.valuePoint].min()
+            self.max=dff[self.valuePoint].max()
     def filter_dataset(self, column, value):
         if(self.active_mode=='Original'):
             dff=self.df_original
@@ -192,5 +220,28 @@ class dataset:
                 self.colors.append('#%02X%02X%02X' % (r(),r(),r()))
         elif(len(colors)<len(self.colors)):
             self.colors=self.colors[0:len(colors)]
+    def get_line_chart(self, filters=None, values=None,colors=None, tick=None, dt=None):
+        dff=self.getActive().copy()
+        if(not filters==None):
+            if(type(filters)=='list' and type(values)=='list'):
+                for i in range(0, len(filters)):
+                    dff=dff[dff[filters[i]==values[i]]]
+            else:
+                dff=dff[dff[filters]==values]
+        fig=px.line(dff, x='Year', y=self.valuePoint, color=colors, color_discrete_sequence=get_colors(dff[colors].unique()))
+        fig.update_xaxes(rangeslider_visible=True)
+        if(not self.active_mode=='Original'):
+            fig.update_yaxes(ticksuffix='%')
+        if(tick!=None and dt!=None):
+            fig.update_xaxes(tick0=tick, dtick=dt)
+        return fig
+    def test_maxmin(self):
+        dff=self.df_original.copy()
+        print(dff[self.valuePoint].max())
+        print(dff[self.valuePoint].min())
+    def get_columns(self)->list:
+        return self.df_original.columns
+            
+        
 
         

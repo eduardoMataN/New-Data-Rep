@@ -36,6 +36,7 @@ povertyDatabag=dataBag([ageDataset, sexDataset, raceDataset, educDataset])
 layout=html.Div([
     
     dbc.Container([
+    html.Br(),
     dcc.Tabs(id='poverty-tabs', value='tab-age', children=[
         dcc.Tab(label='By Age', value='tab-age', style=tab_style, selected_style=tab_selected_style),
         dcc.Tab(label='By Race', value='tab-race', style=tab_style, selected_style=tab_selected_style),
@@ -50,7 +51,8 @@ layout=html.Div([
                 html.Div([
                     html.H2(id='section-title',children=['Poverty By Age'], style=TITLE)
                 ])
-            ])
+            ]),
+            html.Hr(style=HR)
         ])
     ]),
     dbc.Container([
@@ -86,7 +88,7 @@ layout=html.Div([
                     daq.ToggleSwitch(
                         id='toggle-poverty',
                         label='By County/By Age',
-                        labelPosition='bottom',
+                        labelPosition='top',
                         value=False,
                         style=LABEL,
                         disabled=False

@@ -61,7 +61,8 @@ layout=html.Div([
     dbc.Container([
         dbc.Row([
             dbc.Col([
-                html.H2(id='staff-title',children=['Border Patrol Agent Staffing'], style=TITLE)
+                html.H2(id='staff-title',children=['Border Patrol Agent Staffing'], style=TITLE),
+                html.Hr(style=HR)
             ]),
             dbc.Col([
                 html.Div([
@@ -76,8 +77,7 @@ layout=html.Div([
                 dcc.Tab(label='By Region', value='region', style=tab_style, selected_style=tab_selected_style),
                 dcc.Tab(label='By Sector', value='sector', style=tab_style, selected_style=tab_selected_style)
             ])
-        ]),
-        html.Br(),
+        ])
         
     ]),
     html.Br(),
@@ -99,13 +99,13 @@ layout=html.Div([
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
+                        html.P(' Units: Individuals', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Last Update: 2019', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Last Update: 2019', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Source: USA Gov', style={'color':blue})
                     ], width=3),
                     dbc.Col([
                     html.Div([

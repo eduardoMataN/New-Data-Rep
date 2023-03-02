@@ -50,12 +50,14 @@ layout=html.Div(children=[
     )
     ], hidden=True, style={'z-index':'999'}),
     dbc.Container(children=[
+    html.Br(),
         dbc.Row([
             dbc.Col([
                 html.Div([
                     html.H2(children=['Crime by County'], style={'color':'#041E42'})
                 ])
-            ])
+            ]),
+            html.Hr(style=HR)
         ]),
         dbc.Row([
             dbc.Col([
@@ -110,7 +112,8 @@ layout=html.Div(children=[
             ]),
             dbc.Col([
                 html.Div([
-                    
+                    ALIGN_LABEL,
+                    html.Br(),
                     dbc.Button('Edit Graph', id='edit-crime', outline=True, color="primary", className="me-1", value='edit')
                 ])
             ])

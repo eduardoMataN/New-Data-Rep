@@ -60,14 +60,17 @@ layout=html.Div(children=[
     )
     ], hidden=True),
     dbc.Container([
+    html.Br(),
         dbc.Row([
             dbc.Col([
                 html.Div([
                     html.H2(id='emp-title',children=['Employment by Industry'], style=TITLE)
                 ])
-            ])
+            ]),
+            html.Hr(style=HR)
         ])
     ]),
+    html.Br(),
     dbc.Container(children=[
         dbc.Row([
             dbc.Col([
@@ -172,13 +175,13 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        html.P('Units: Individuals', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Units: Individuals', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Last Update: March 2020', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Last Update: March 2020', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Source: USA Gov', style={'color':blue})
                     ], width=3),
                     dbc.Col([
                     html.Div([

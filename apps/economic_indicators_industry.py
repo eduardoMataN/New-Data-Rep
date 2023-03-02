@@ -18,7 +18,7 @@ from apps.dataBag import *
 PATH = pathlib.Path(__file__).parent #So this first line is going to the parent of the current path, which is the Multipage app. 
 DATA_PATH = PATH.joinpath("../datasets").resolve() #Once we're on that path, we go into datasets. 
 df_est=pd.read_excel(DATA_PATH.joinpath('Number of Establishments.xlsx'))
-stabDataset=dataset('Number of Business Stablishments by Year Chart', df_est, 'Value', 'stablishments', 'County', 'Value')
+stabDataset=dataset('Number of Business Stablishments by Year Chart', df_est, 'Value', 'stablishments', 'County', 'Value', groupMax=True, groupValue=['Year','County'])
 toTable=df_est[df_est['Year']==df_est['Year'][0]][['County', 'Period', 'Value']]
 df_gdp=pd.read_excel(DATA_PATH.joinpath('GDP by Industry for Border Counties.xlsx'))
 gdpDatasetCounty=dataset('GDP by Industry for Border Counties Chart', df_gdp, 'GDP', 'gdpCounty', 'County', 'GDP')
@@ -30,9 +30,8 @@ layout=html.Div(children=[
     html.Br(),
     dbc.Container(children=[
         html.Div(id='sidebar-space-ind',children=[
-        html.Div(
-    [
-        html.H6(id='sidebar-title-ind',children='Number of Business Stablishments by Year'),
+        html.Div([
+        html.H6(id='sidebar-title-ind',children='Number of Business Stablishments by Year Chart'),
         html.Hr(),
         html.P(
             "Use the following buttons to edit the chart.", className="lead"
@@ -46,18 +45,26 @@ layout=html.Div(children=[
             value='Original',
             
         ),
-        
+        html.Label('Max Y Value:', style=LABEL),
+        html.Br(),
+        dcc.Input(id='max_input-ind', type='number', min=10, max=1000, value=150),
+        html.Br(),
+        html.Label('Min Y Value:', style=LABEL),
+        html.Br(),
+        dcc.Input(id='min_input-ind', type='number', min=10, max=1000, value=150),
+        html.Br(),
+        html.Br(),
+        dbc.Button('Reset', id='reset-ind', outline=True, color="primary", className="me-1", value='reset', n_clicks=0)
 
-
+        ], style=SIDEBAR_STYLE)
         
-    ],
-    style=SIDEBAR_STYLE,
-    )
+    
     ], hidden=True),
         dbc.Row([
             dbc.Col(
                 html.Div([
-                    html.H2(id='title',children=['Number of Business Stablishments by Year'], style={'color':blue})
+                    html.H2(id='title',children=['Number of Business Stablishments by Year'], style={'color':blue}),
+                    html.Hr(style=HR)
                 ])
             ),
             dbc.Col([
@@ -79,13 +86,13 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
+                        html.P(' Units: Dollars ($)', style=INFO_BOX_STYLE)
                     ], width=3),
                     dbc.Col([
-                        html.P(id='chartmode',children='Last Update: June 2022', style={'color':blue, 'font-weight':'bold'})
+                        html.P(id='chartmode',children='Last Update: June 2022', style=INFO_BOX_STYLE)
                     ], width=3),
                     dbc.Col([
-                        html.P(id='experiment',children='Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                        html.P(id='experiment',children='Source: USA Gov',style=INFO_BOX_STYLE)
                     ], width=3),
                     dbc.Col([
                     html.Div([
@@ -151,13 +158,15 @@ layout=html.Div(children=[
         ),
     ]),
     html.Br(),
+    html.Br(),
     dbc.Container([
         dbc.Row([
             dbc.Col([
                 html.Div([
-                    html.H1(['GDP by Industry for Border Counties'], style=TITLE)
+                    html.H1(id='dummy_ind',children=['GDP by Industry for Border Counties'], style=TITLE)
                 ])
-            ])
+            ]),
+            html.Hr(style=HR)
         ])
     ]),
     dbc.Container([
@@ -209,6 +218,8 @@ layout=html.Div(children=[
             ]),
             dbc.Col([
                 html.Div([
+                    ALIGN_LABEL,
+                    html.Br(),
                     dbc.Button('Edit Graph', id='edit-gdp', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
             ], width=2),
@@ -233,16 +244,18 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
+                        html.P(' Units: Dollars ($)', style=INFO_BOX_STYLE)
                     ], width=3),
                     dbc.Col([
-                        html.P('Last Update: June 2022', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Last Update: June 2022',style=INFO_BOX_STYLE)
                     ], width=3),
                     dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Source: USA Gov', style=INFO_BOX_STYLE)
                     ], width=3),
                     dbc.Col([
                     html.Div([
+                        ALIGN_LABEL,
+                        html.Br(),
                         dbc.Button('Download Dataset', id='download-bttn-ind-2', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                     ]),
                     dcc.Download(id='download-ind-2')
@@ -276,16 +289,22 @@ def download_median(downloadB):
 @app.callback(
     [Output('sidebar-space-ind','hidden'),
     Output('sidebar-title-ind','children'),
-    Output('chartmode','children')],
+    Output('max_input-ind', 'max'),
+    Output('max_input-ind', 'min'),
+    Output('min_input-ind', 'max'),
+    Output('min_input-ind','min'),
+    Output('max_input-ind','value'),
+    Output('min_input-ind','value'),],
     [Input('sidebar-space-ind', 'hidden'),
     Input('edit-gdp','n_clicks'),
     Input('edit-stablishments', 'n_clicks'),
-    Input('chart-options-ind','value'),
+    Input('select-county-gdp','value'),
+    Input('select-industry-gdp','value'),
     Input('county-button', 'on'),
     Input('industry-button','on'),
     Input('sidebar-title-ind','children'),]
 )
-def get_sidebar(hideSideBar, button, button2, chartMode, countyButton, industryButton, title):
+def get_sidebar(hideSideBar, button, button2, countyValue, industryValue, countyButton, industryButton, title):
     trigger_id=ctx.triggered_id
     if(trigger_id=='edit-stablishments'):
         if(hideSideBar):
@@ -303,11 +322,65 @@ def get_sidebar(hideSideBar, button, button2, chartMode, countyButton, industryB
         if(industryButton):
             title=industryDatabag.get_title_by_name('gdpDesc')
     #print(chartMode)
-    industryDatabag.getDataframe(title).activateDataframe(chartMode)
-        
+    
+
+    if(title !='Number of Business Stablishments by Year Chart'):
+        if(countyButton):
+            industryDatabag.getDataframe(title).adjustMinMax('County', countyValue)
+        if(industryButton):
+            industryDatabag.getDataframe(title).adjustMinMax('Description', industryValue)
+    currentDataset=industryDatabag.getDataframe(title)
+    currentDataset.test_maxmin()
+    
+    currMin=currentDataset.min
+    currMax=currentDataset.max
+    
+
+
+    if(currentDataset.isTrimmed()):
+        currentValueMax=currentDataset.trimMax
+        currentValueMin=currentDataset.trimMin
+        minMax=currentDataset.trimMax-1
+        maxMin=currentDataset.trimMin-1
+    else:
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        minMax=currentDataset.max-1
+        maxMin=currentDataset.min+1
+    if(trigger_id=='reset-trade'):
+        currentValueMax=currentDataset.max
+        currentValueMin=currentDataset.min
+        hideSideBar=False
+    if(trigger_id=='max_input-ind' or trigger_id=='min_input-ind'):
+        minMax=max-1
+        maxMin=min+1
+        currentValueMax=max
+        currentValueMin=min
+        hideSideBar=False
+    
+
     
             
-    return hideSideBar, title, industryDatabag.getDataframe(title).getActiveMode()
+    return hideSideBar, title, currMax, maxMin, minMax, currMin, currentValueMax, currentValueMin
+@app.callback(
+    Output('dummy_ind','children'),
+    [Input('chart-options-ind','value'),
+    Input('max_input-ind','value'),
+    Input('min_input-ind','value'),
+    Input('sidebar-title-ind','children'),
+    Input('reset-ind','n_clicks'),
+    Input('dummy_ind','children')
+    ]
+) 
+def change_chart(chartMode, max, min, title, reset, mainTitle):
+    trigger_id=ctx.triggered_id
+    industryDatabag.getDataframe(title).activateDataframe(chartMode)
+    if(trigger_id=='max_input-ind' or trigger_id=='min_input-ind'):
+        industryDatabag.getDataframe(title).trim(max, min)
+    if(trigger_id=='reset-ind'):
+        industryDatabag.getDataframe(title).reset()
+    return mainTitle
+
 
 @app.callback(
     
@@ -328,13 +401,17 @@ def get_sidebar(hideSideBar, button, button2, chartMode, countyButton, industryB
         Input('select-county-gdp','value'),
         Input('industry-button', 'on'),
         Input('select-industry-gdp','value'),
-        Input('chart-options-ind', 'value')]
+        Input('chart-options-ind', 'value'),
+        Input('max_input-ind','value'),
+        Input('min_input-ind','value'),
+        Input('reset-ind','n_clicks')]
     
 )
-def update_data(title, countyT,yearT, countyOn, countyValue, industryOn, industryValue, dummyValue):
+def update_data(title, countyT,yearT, countyOn, countyValue, industryOn, industryValue, dummyValue, dummyMax, dummyMin, dummyReset):
     trigger_id=ctx.triggered_id
     exp=industryDatabag.getDataframe('Number of Business Stablishments by Year Chart').getActiveMode()
     dff=industryDatabag.getDataframe('Number of Business Stablishments by Year Chart').getActive().copy()
+    dff.groupby('Year')
     finalFig=px.line(sum_df(dff, 'County', 'Year', 'Value'), x='Year', y='Value', color='County', color_discrete_sequence=get_colors(dff['County'].unique()))
     finalFig.update_xaxes(nticks=len(pd.unique(dff['Year'])))
     finalFig.update_xaxes( rangeslider_visible=True)

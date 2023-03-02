@@ -84,33 +84,15 @@ layout=html.Div(children=[
     
     ], is_open=False),
     dbc.Container(children=[
-        dbc.Row([
-            dbc.Col(
-                html.Div([
-                    html.H1(id='Port-Title-income',  style={'color':'#041E42', 'text-align':'center'})
-                    
-                ]),
-            ),
-            dbc.Col(
-                html.Div([
-                    html.H1(id='section-title-income', children=['Economic Indicators'], style={'color':'#041E42', 'text-align':'center'})
-                ])
-            ),
-            dbc.Col(
-                html.Div([
-                    html.H1(id='Port-Title2-income', style={'color':'#041E42', 'text-align':'center'})
-                ])
-            )
-            
-        ])
-    ]),
-    dbc.Container(children=[
+    html.Br(),
         dbc.Row([
             dbc.Col(
                 html.Div([
                     html.H2(id='median-income-title', children=['Median Household & Personal Income'], style={'color':'#041E42'})
-                ])
-            )
+                ]),
+                
+            ),
+            html.Hr(style=HR)
         ]),
         dbc.Row([
             dbc.Col(
@@ -150,6 +132,8 @@ layout=html.Div(children=[
             , width=3),
             dbc.Col([
                 html.Div([
+                    ALIGN_LABEL,
+                    html.Br(),
                     dbc.Button('Edit Graph', id='edit-income', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ], style={"padding": "0rem 0rem"})
             ], style={'margin-left': '0px', "padding": "0px 0px"}, width=2)
@@ -171,13 +155,13 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
+                        html.P(' Units: Dollars ($)', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Last Update: 2020', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Last Update: 2020', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Source: USA Gov', style={'color':blue})
                     ], width=3),
                     dbc.Col([
                 html.Div([
@@ -198,7 +182,8 @@ layout=html.Div(children=[
                 html.Div([
                     html.H2(id='households-title', children=['Household Family Income by Zip Code'], style={'color':'#041E42'})
                 ])
-            )
+            ),
+            html.Hr(style=HR)
         ])
     ]),
     dbc.Container(children=[
@@ -260,13 +245,13 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        html.P(' Units: Dollars ($)', style={'color':blue, 'font-weight':'bold'})
+                        html.P(' Units: Dollars ($)', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Last Update: 2020', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Last Update: 2020', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Source: USA Gov', style={'color':blue})
                     ], width=3),
                     dbc.Col([
                 html.Div([
@@ -285,7 +270,8 @@ layout=html.Div(children=[
         dbc.Row([
             dbc.Col(
                 html.H2("Revenues by Workers Remittances. Chihuahua, Juarez.", style={'color':'#041E42'})
-            )
+            ),
+            html.Hr(style=HR)
         ]),
         dbc.Row([
             dbc.Col(
@@ -299,13 +285,13 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        html.P(' Units: Dollars in Millions ($)', style={'color':blue, 'font-weight':'bold'})
+                        html.P(' Units: Dollars in Millions ($)', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Last Update: April 2022', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Last Update: April 2022', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Source: USA Gov', style={'color':blue})
                     ], width=3),
                     dbc.Col([
                 html.Div([

@@ -49,10 +49,12 @@ layout=html.Div(children=[
     )
     ], hidden=True),
     dbc.Container(children=[
+    html.Br(),
         dbc.Row([
             dbc.Col([
                 html.H2(['Educational Attainment Rate by County'], style=TITLE)
-            ])
+            ]),
+            html.Hr(style=HR)
         ])
     ]),
     dbc.Container([
@@ -79,7 +81,8 @@ layout=html.Div(children=[
             ]),
             dbc.Col([
                 html.Div([
-                    
+                    ALIGN_LABEL,
+                    html.Br(),
                     dbc.Button('Edit Graph', id='edit-educ', outline=True, color="primary", className="me-1", value='edit')
                 ])
             ], width=2),
@@ -134,13 +137,13 @@ layout=html.Div(children=[
             html.Div(children=[
                 dbc.Row([
                     dbc.Col([
-                        html.P(' Units: Individuals', style={'color':blue, 'font-weight':'bold'})
+                        html.P(' Units: Individuals', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Last Update: 2020', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Last Update: 2020', style={'color':blue})
                     ], width=3),
                     dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue, 'font-weight':'bold'})
+                        html.P('Source: USA Gov', style={'color':blue})
                     ], width=3),
                     dbc.Col([
                     html.Div([

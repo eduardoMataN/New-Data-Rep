@@ -112,7 +112,8 @@ layout=html.Div([
                 html.Div([
                     html.H2(id='app-title',children=['Yearly Apprehensions by Sector'], style=TITLE)
                 ])
-            ])
+            ]),
+            html.Hr(style={'color':blue, 'borderWidth': "0.3vh", 'borderColor':blue, 'opacity':'unset', 'width':'100%'})
         ])
     ]),
     dbc.Container([
@@ -139,6 +140,8 @@ layout=html.Div([
             ]),
             dbc.Col([
                 html.Div([
+                    html.Label(['Edit'], style={'color':'#ffffff'}),
+                    html.Br(),
                     dbc.Button('Edit Graph', id='edit-yearly', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
                 ])
             ], width=2),
