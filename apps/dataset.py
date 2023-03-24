@@ -241,6 +241,8 @@ class dataset:
         print(dff[self.valuePoint].min())
     def get_columns(self)->list:
         return self.df_original.columns
+    def get_title(self):
+        return self.title
             
         
 
