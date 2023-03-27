@@ -24,7 +24,7 @@ epDataset.modify_percent_change('Mode', 'Commodity', 'Total')
 layout=html.Div(children=[
     html.Div(id='sidebar-space-trade-epFlows',children=[
         html.Div([
-        html.H6(id='sidebar-title-trade-epFlows',children='Number of Business Stablishments by Year Chart'),
+        html.H6(id='sidebar-title-trade-epFlows',children='Total Flows to El Paso by Year'),
         html.Hr(),
         html.P(
             "Use the following buttons to edit the chart.", className="lead"
@@ -163,9 +163,9 @@ def download_median(downloadB):
     [Input('edit-trade-flows', 'n_clicks'),
     Input('sidebar-space-trade-epFlows', 'hidden'),
     Input('select-mode-int','value'),
-    Input('reset-trade-flows', 'n_clicks')]
+    Input('reset-trade-epFlows', 'n_clicks')]
 )
-def get_sidebar(editButton,showSideBar, mode):
+def get_sidebar(editButton,showSideBar, mode, reset):
     trigger_id=ctx.triggered_id
     if(trigger_id=='edit-trade-flows'):
         name='totalFlows'
@@ -174,6 +174,8 @@ def get_sidebar(editButton,showSideBar, mode):
         else:
             showSideBar=True
     epDataset.adjustMinMax('Mode',mode)
+    if(trigger_id=='select-mode-int'):
+        epDataset.reset()
     currentDataset=epDataset
     currMin=currentDataset.min
     currMax=currentDataset.max
@@ -187,29 +189,31 @@ def get_sidebar(editButton,showSideBar, mode):
         currentValueMin=currentDataset.min
         minMax=currentDataset.max-1
         maxMin=currentDataset.min+1
-    if(trigger_id=='reset-trade-flows'):
+    if(trigger_id=='reset-trade-epFlows'):
         currentValueMax=currentDataset.max
         currentValueMin=currentDataset.min
-        showSideBar=True
+        showSideBar=False
     if(trigger_id=='max_input-trade-epFlows' or trigger_id=='min_input-trade-epFlows'):
         minMax=max-1
         maxMin=min+1
         currentValueMax=max
         currentValueMin=min
-        showSideBar=True
+        showSideBar=False
     return showSideBar, currMax, maxMin, minMax, currMin, currentValueMax, currentValueMin
+
+
 @app.callback(
-    Output('dummy_trade-epFlows','children'),
+    Output('sidebar-title-trade-epFlows','children'),
     [Input('chart-options-trade-epFlows','value'),
     Input('max_input-trade-epFlows','value'),
     Input('min_input-trade-epFlows','value'),
-    Input('reset-trade-flows','n_clicks'),
-    Input('dummy_trade-epFlows','children')
-    ]
+    Input('reset-trade-epFlows','n_clicks'),
+    Input('dummy-trade-epFlows','children')]
 )
 def update_dataset(chartMode, max, min, reset, mainTitle):
     trigger_id=ctx.triggered_id
     epDataset.activateDataframe(chartMode)
+    
     if(trigger_id=='max_input-trade-epFlows' or trigger_id=='min_input-trade-epFlows'):
         epDataset.trim(max, min)
     if(trigger_id=='reset-trade-flows'):
@@ -223,7 +227,7 @@ def update_dataset(chartMode, max, min, reset, mainTitle):
     Input('chart-options-trade-epFlows', 'value'),
     Input('max_input-trade-epFlows','value'),
     Input('min_input-trade-epFlows','value'),
-    Input('reset-trade-flows','n_clicks')]
+    Input('reset-trade-epFlows','n_clicks')]
 )
 def generate_chart(mode, dummyValue, dummyMax, dummyMin, dummyReset):
     dff_ep=epDataset.getActive().copy()

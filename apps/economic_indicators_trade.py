@@ -63,7 +63,7 @@ layout=html.Div(children=[
         html.Br(),
         html.Div(id='subMenu-section-trade',children=[])
         
-    ]),
+    ])
 ])
 
 @app.callback(

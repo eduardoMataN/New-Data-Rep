@@ -57,395 +57,46 @@ CONTENT_STYLE = {
     "margin-right": "0rem",
     "padding": "0rem 0rem",
 }
+from apps import economic_indicators_income_median as median
+from apps import economic_indicators_income_household  as household
+subsectionDic={'median':median.layout, 'household':household.layout}
 
 layout=html.Div(children=[
-    dbc.Offcanvas(id='sidebar-space-income',children=[
-        
-    
-        html.H6(id='sidebar-title-income',children='Border Patrol Agent Staffing'),
-        html.Hr(),
-        html.P(
-            "Use the following buttons to edit the chart.", className="lead"
-        ),
-        dbc.RadioItems(
-            id='chart-options-income',
-            options=[
-                {'label':'Percent Change','value':'PercentChange'},
-                {'label': 'Original Chart','value':'Original'}
-            ],
-            value='Original',
-            
-        ),
-        
-
-
-        
-    
-    
-    ], is_open=False),
-    dbc.Container(children=[
     html.Br(),
-        dbc.Row([
-            dbc.Col(
-                html.Div([
-                    html.H2(id='median-income-title', children=['Median Household & Personal Income'], style={'color':'#041E42'})
-                ]),
-                
-            ),
-            html.Hr(style=HR)
-        ]),
-        dbc.Row([
-            dbc.Col(
-                html.Div([
-                    html.Label('Indicator', style={'font-weight':'bold'}),
-                    dcc.Dropdown(id='select-indicator',
-                    options=[{'label':x, 'value':x} for x in df_median['Indicator'].unique()],
-                    multi=False,
-                    value=df_median['Indicator'].tolist()[0],
-                    style={'width':'100%'},
-                    optionHeight=90)
-                ])
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Label('Household Type', style={'font-weight':'bold'}),
-                    dcc.Dropdown(id='select-household',
-                    options=[{'label':x, 'value':x} for x in df_median['Household Type'].dropna().unique()],
-                    multi=False,
-                    value=df_median['Household Type'].dropna().unique()[0],
-                    style={'width':'100%'},
-                    optionHeight=90,
-                    disabled=True)
-                ])
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Label('Industry', style={'font-weight':'bold'}),
-                    dcc.Dropdown(id='select-industry',
-                    options=[{'label':x, 'value':x} for x in df_median['Industry'].dropna().unique()],
-                    multi=False,
-                    value=df_median['Industry'].dropna().unique()[4],
-                    style={'width':'100%'},
-                    optionHeight=90,
-                    disabled=True)
-                ])
-            , width=3),
-            dbc.Col([
-                html.Div([
-                    ALIGN_LABEL,
-                    html.Br(),
-                    dbc.Button('Edit Graph', id='edit-income', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
-                ], style={"padding": "0rem 0rem"})
-            ], style={'margin-left': '0px', "padding": "0px 0px"}, width=2)
-            
-        ])
-    ]),
     dbc.Container(children=[
-        dbc.Row([
-            dbc.Col(
-                html.Div([
-                    dcc.Graph(id='median-graph', figure={})
-                ])
-            )
-        ])
-    ]),
-    dbc.Container([
-        dbc.Row([
-            dbc.Col([
-            html.Div(children=[
-                dbc.Row([
-                    dbc.Col([
-                        html.P(' Units: Dollars ($)', style={'color':blue})
-                    ], width=3),
-                    dbc.Col([
-                        html.P('Last Update: 2020', style={'color':blue})
-                    ], width=3),
-                    dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue})
-                    ], width=3),
-                    dbc.Col([
-                html.Div([
-                    dbc.Button('Download Dataset', id='download-bttn-income', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
-                ]),
-                dcc.Download(id='download-income')
-            ],  style={'margin-left': '0px', 'margin-right':'0px'}, width=2)
-                ], align='center', justify='center')
-            ])
-            ]),
-        ], align='center', justify='center'),
+        dcc.Tabs(id='income-tabs', children=[
+            dcc.Tab(label='Median Household & Personal Income', value='median', style=tab_style, selected_style=tab_selected_style),
+            dcc.Tab(label='Household Family Income by Zip Code', value='household', style=tab_style, selected_style=tab_selected_style)
+        ], value='median'),
         html.Br(),
-    html.Br(),
-    ]),
-    dbc.Container(children=[
-        dbc.Row([
-            dbc.Col(
-                html.Div([
-                    html.H2(id='households-title', children=['Household Family Income by Zip Code'], style={'color':'#041E42'})
-                ])
-            ),
-            html.Hr(style=HR)
-        ])
-    ]),
-    dbc.Container(children=[
-        dbc.Row([
-            dbc.Col(
-                html.Div([
-                    html.Label('Zip Code', style={'font-weight':'bold'}),
-                    dcc.Dropdown(id='select-zip',
-                    options=[{'label':x, 'value':x} for x in df_income_zip['ZIP'].unique()],
-                    multi=False,
-                    value=df_income_zip['ZIP'].tolist()[0],
-                    style={'width':'100%'},
-                    optionHeight=90)
-                    
-                ])
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Label('Year', style={'font-weight':'bold'}),
-                    dcc.Dropdown(id='select-year',
-                    options=[{'label':x, 'value':x} for x in df_income_zip['Year'].unique()],
-                    multi=False,
-                    value=df_income_zip['Year'].tolist()[0],
-                    style={'width':'100%'},
-                    optionHeight=90)
-                    
-                ])
-            )
-            
-        ])
-    ]),
-    dbc.Container(children=[
-        dbc.Row([
-            dbc.Col(
-                html.Div([
-                    dcc.Graph(id='pie-income', figure={})
-                ])
-            )
-            
-        ])
-    ]),
-    dbc.Container(children=[
-        dbc.Row([
-            dbc.Col(
-                html.Div([
-                    dcc.Graph(id='pie-ep', figure={})
-                ])
-            ),
-            dbc.Col(
-                html.Div([
-                    dcc.Graph(id='pie-tx', figure={})
-                ])
-            )
-        ])
-    ]),
-    dbc.Container([
-        dbc.Row([
-            dbc.Col([
-            html.Div(children=[
-                dbc.Row([
-                    dbc.Col([
-                        html.P(' Units: Dollars ($)', style={'color':blue})
-                    ], width=3),
-                    dbc.Col([
-                        html.P('Last Update: 2020', style={'color':blue})
-                    ], width=3),
-                    dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue})
-                    ], width=3),
-                    dbc.Col([
-                html.Div([
-                    dbc.Button('Download Dataset', id='download-bttn-income2', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
-                ]),
-                dcc.Download(id='download-income2')
-            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
-                ], align='center', justify='center')
-            ])
-            ]),
-        ], align='center', justify='center'),
-        html.Br(),
-    html.Br(),
-    ]),
-    dbc.Container(children=[
-        dbc.Row([
-            dbc.Col(
-                html.H2("Revenues by Workers Remittances. Chihuahua, Juarez.", style={'color':'#041E42'})
-            ),
-            html.Hr(style=HR)
-        ]),
-        dbc.Row([
-            dbc.Col(
-                dcc.Graph(id='line-rev', figure={})
-            )
-        ])
-    ]),
-    dbc.Container([
-        dbc.Row([
-            dbc.Col([
-            html.Div(children=[
-                dbc.Row([
-                    dbc.Col([
-                        html.P(' Units: Dollars in Millions ($)', style={'color':blue})
-                    ], width=3),
-                    dbc.Col([
-                        html.P('Last Update: April 2022', style={'color':blue})
-                    ], width=3),
-                    dbc.Col([
-                        html.P('Source: USA Gov', style={'color':blue})
-                    ], width=3),
-                    dbc.Col([
-                html.Div([
-                    dbc.Button('Download Dataset', id='download-bttn-income3', outline=True, color="primary", className="me-1", value='yearly', n_clicks=0)
-                ]),
-                dcc.Download(id='download-income3')
-            ],  style={'margin-left': '0px', 'margin-right':'1px'}, width=2)
-                ], align='center', justify='center')
-            ])
-            ]),
-        ], align='center', justify='center'),
-        html.Br(),
-    html.Br(),
-    ]),
-    
-    
-    
-    
-    
-    
-    
-]
-
-)
-@app.callback(
-    Output('download-income3','data'),
-    Input('download-bttn-income3', 'n_clicks'),
-    prevent_initial_call=True
-)
-def download_median(downloadB):
-
-    return dcc.send_data_frame(df_revenues.to_excel, 'Revenues by Workers Remittances. Chihuahua, Juarez.xlsx')
+        html.Div(id='subMenu-section-income',children=[])
+        
+    ])
+])
 
 @app.callback(
-    Output('download-income2','data'),
-    Input('download-bttn-income2', 'n_clicks'),
-    prevent_initial_call=True
+    Output('subMenu-section-income', 'children'),
+    Input('income-tabs','value')
 )
-def download_median(downloadB):
+def update_submenu(tabValue):
+    try:
+        return subsectionDic[tabValue]
+    except:
+        return median.layout
 
-    return dcc.send_data_frame(df_income.to_excel, 'Household Family Income by Zip Code.xlsx')
 
-@app.callback(
-    Output('download-income','data'),
-    Input('download-bttn-income', 'n_clicks'),
-    prevent_initial_call=True
-)
-def download_median(downloadB):
 
-    return dcc.send_data_frame(df_median.to_excel, 'Median Household & Personal Income.xlsx')
 
-@app.callback(
-    [Output('sidebar-space-income','is_open'),
-    Output('sidebar-title-income', 'children'),],
-    [Input('edit-income', 'n_clicks'),
-    Input('select-indicator','value'),
-    Input('sidebar-space-income', 'hidden'),
-    Input('chart-options-income', 'value'),
-    Input('sidebar-title-income', 'children')]
-)
-def get_sidebar(button, indicatorValue, hideSideBar, graphMode, title):
-    trigger_id=ctx.triggered_id
-    
-    if(trigger_id=='edit-income'):
-        if(hideSideBar):
-            hideSideBar=False
-        else:
-            hideSideBar=True
-        title=incomeDatabag.getByName(indicatorValue).title
-    
-    
-    incomeDatabag.getByName(indicatorValue).activateDataframe(graphMode)
 
-    
-    return hideSideBar, title
 
-@app.callback(
-    [Output(component_id='median-graph', component_property='figure'), Output(component_id='select-household', component_property='disabled'),
-    Output(component_id='select-industry', component_property='disabled'), Output(component_id='line-rev', component_property='figure')],
-    [Input(component_id='select-indicator', component_property='value'), Input(component_id='select-household', component_property='value'),
-    Input(component_id='select-industry', component_property='value'), Input('chart-options-income', 'value')]
-)
-def update_median(ind, household, industry, chartType):
-    drop1=True
-    
-    drop3=True
-    
-    dff=incomeDatabag.getByName(ind).getActive().copy()
-    
-    fig=make_subplots(rows=1, cols=1)
-    if(ind=='Personal Per Capita Income'):
-        drop1=True
-        df_temp=dff[dff['Indicator']==ind]
-        counties=df_temp['County'].unique()
-        fig=create_subplot(fig, 1, 1, df_temp, 'Year', 'Income', 'County')
-        fig.update_xaxes(rangeslider_visible=True)
-        if(chartType=='PercentChange'):
-            fig.update_yaxes(ticksuffix='%')
-    
-    if (ind=='Median Household Income'):
-        drop1=False
-        df_temp=dff[dff['Indicator']==ind]
-        counties=df_temp['County'].unique()
-        fig=create_subplot(fig, 1, 1, df_temp[df_temp['Household Type']==household], 'Year', 'Income', 'County')
-        fig.update_xaxes(rangeslider_visible=True)
-        if(chartType=='PercentChange'):
-            fig.update_yaxes(ticksuffix='%')
-    
-    if (ind=='Earnings by Industry'):
-        drop3=False
-        df_temp=dff[dff['Indicator']==ind]
-        df_temp=dff[dff['Industry']==industry]
-        counties=df_temp['County'].unique()
-        fig=create_subplot(fig, 1, 1, df_temp[df_temp['Industry']==industry], 'Year', 'Income', 'County')
-        fig.update_xaxes(rangeslider_visible=True)
-        if(chartType=='PercentChange'):
-            fig.update_yaxes(ticksuffix='%')
-        else:
-            fig.update_yaxes(ticksuffix='M')
-    dff_revenues=incomeDatabag.getByName('revenues').getActive().copy()
-    fig3=px.line(dff_revenues, x='Date', y='Dollars in Millions')
-    fig3.update_layout(yaxis_tickprefix='$')
-    fig3.update_xaxes(rangeslider_visible=True)
-    return fig, drop1, drop3, fig3
+
 
 
 
         
 
 
-@app.callback(
-    [Output(component_id='pie-income', component_property='figure'),
-    Output(component_id='pie-ep', component_property='figure'), Output(component_id='pie-tx', component_property='figure')],
-    [Input(component_id='select-zip', component_property='value'), 
-    Input(component_id='select-year', component_property='value'),
-    ]
-)
-def update_pie(zip, year):
-    dff=df_income.copy()
-    df_zip=dff[~dff['ZIP'].isin(['Texas', 'El Paso County, Texas'])]
-    df_overall=dff[dff['ZIP'].isin(['Texas', 'El Paso County, Texas'])]
-    
 
-
-    df_zip=df_zip[(df_zip['ZIP']==zip) & (df_zip['Year']==year)]
-    
-    df_ep=df_overall[(df_overall['ZIP']== 'El Paso County, Texas') & (df_overall['Year']==year)]
-    df_tx=df_overall[(df_overall['ZIP']== 'Texas') & (df_overall['Year']==year)]
-    fig=px.pie(df_zip, values='Income', names='HouseholdsTypes')
-    
-    fig_ep=px.pie(df_ep, values='Income', names='HouseholdsTypes', title='El Paso Households Income', color_discrete_sequence=px.colors.sequential.Sunset)
-    fig_tx=px.pie(df_tx, values='Income', names='HouseholdsTypes', title='Texas Household Income', color_discrete_sequence=px.colors.sequential.Sunset)
-
-    return fig,  fig_ep, fig_tx
 
 
 
